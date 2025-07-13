@@ -1,0 +1,103 @@
+{% extends 'Account/base.html' %}
+{% load static %}
+{% block title %}View Records - Spend Server{% endblock %}
+{% block page_title %}View All Records{% endblock %}
+{% block breadcrumbs %}Home / View Records{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'CSS/Account/view_records.css' %}">
+{% endblock %}
+{% block content %}
+<div class="table-actions filter-controls" style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
+    <label for="filter-type" style="color: white;">Filter By:</label>
+    <select id="filter-type" class="form-control" style="width: 180px;">
+        <option value="">-- Select Type --</option>
+        <option value="date">Date</option>
+        <option value="description">Description</option>
+        <option value="due_from">Due From</option>
+        <option value="status">Status</option>
+    </select>
+
+    <input type="text" id="filter-input" class="form-control" placeholder="Type to search..." style="display: none;">
+
+    <select id="filter-status" class="form-control" style=" display: none;">
+        <option value="">-- Select Status --</option>
+        <option value="Paid">Paid</option>
+        <option value="Non-Paid">Non-Paid</option>
+    </select>
+</div>
+
+<div class="table-container">
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Date(DD-MM-YY)</th>
+                    <th>Description</th>
+                    <th>Spend Amount</th>
+                    <th>Orginal Amount</th>
+                    <th>Due From</th>
+                    <th>Due Amount</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in records reversed %}
+                <tr>
+                    <td>{{ record.Date|date:"d M, Y" }}</td>
+                    <td>{{ record.Description }}</td>
+                    <td>{{ record.Spend_Amount }}</td>
+                    <td>{{ record.Orginal_Debited_Amount }}</td>
+                    <td>{{ record.Due_From }}</td>
+                    <td>{{ record.Due_Amount }}</td>
+                    <td>{{ record.Status }}</td>
+                    <td>
+                        <div class="action-btns">
+                            <a class="action-btn edit-btn note-btn" data-note="{{ record.Notes }}">
+                                <i class="far fa-sticky-note"></i>
+                            </a>
+                            <a href="/Dashboard/Edit/Data/{{ record.recid }}/{{id}}/" class="action-btn edit-btn">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a class="action-btn delete-btn"
+                                data-delete-url="/Dashboard/Delete/Data/{{ record.recid }}/{{ id }}/">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" style="text-align: left;">No records found</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="note-dialog" class="note-dialog">
+    <div class="note-dialog-content">
+        <button class="note-dialog-close">&times;</button>
+        <h3>Note</h3>
+        <p id="note-dialog-text"></p>
+    </div>
+</div>
+
+<div id="delete-dialog" class="note-dialog">
+    <div class="note-dialog-content">
+        <button class="note-dialog-close delete-dialog-close">&times;</button>
+        <h3>Confirm Deletion</h3>
+        <p>Are you sure you want to delete this record?</p>
+        <div style="margin-top: 15px; display: flex; justify-content: flex-end; gap: 10px;">
+            <button id="confirm-delete-btn" class="btn btn-primary">Yes, Delete</button>
+            <button class="btn btn-outline delete-dialog-close">Cancel</button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'JS/Account/view_record.js' %}"></script>
+{% endblock %}

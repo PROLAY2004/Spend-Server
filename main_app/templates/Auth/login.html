@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Spend Server - Login</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'CSS/Auth/login.css' %}">
+    <link rel="icon" href="{% static 'Images/icon.png' %}" type="image/x-icon">
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+        integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body>
+    <div id="global-loader">
+        <div class="loader-spinner"></div>
+    </div>
+    <main class="box">
+        <div class="content">
+            <div class="logo-container">
+                <i class="fa-solid fa-code fa-lg"></i>
+                <h1>Spend Server</h1>
+            </div>
+            <div class="hero-text">
+                <h2>Smart Spending,<br>Simplified</h2>
+                <p>Track, analyze, and optimize your expenses with our powerful platform.</p>
+            </div>
+        </div>
+        <div class="login">
+            <div class="welcome-container">
+                <h3>Welcome Back!</h3>
+                <p class="subtext">Sign in to access your dashboard and continue managing your expenses.</p>
+            </div>
+
+            <form class="auth-form" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <div class="input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="email" name="mail" placeholder="your@email.com" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-sign-in-alt"></i> Sign In
+                </button>
+
+                <div class="divider">
+                    <span>Or continue with</span>
+                </div>
+
+                <button type="button" class="btn btn-google" onclick="handleGoogleLogin()">
+                    <i class="fab fa-google"></i> Google
+                </button>
+            </form>
+        </div>
+    </main>
+</body>
+<!-- <script src="{% static 'JS/home.js' %}"></script> -->
+<script>
+    function handleGoogleLogin() {
+        // Keep that same as it is 
+        window.location.href = "https://accounts.google.com/o/oauth2/v2/auth?" +
+            // Enter your client Id recived from the cloud console 
+            "client_id=955006115201-lh30dj8ou0sutrncof2g28hctrvk7i89.apps.googleusercontent.com&" +
+            // Same as the URI entered to the cloud console 
+            //    "redirect_uri=http://127.0.0.1:8000/Auth/Google/&" + 
+            "redirect_uri=https://t31g438k-8000.inc1.devtunnels.ms/Auth/Google/&" +
+            // After that no changes needed 
+            "response_type=code&" +
+            "scope=email profile&" +
+            "prompt=select_account&" +
+            "access_type=offline";
+    } 
+</script>
+<script>
+    // Hide loader after page fully loads or comes from bfcache
+    function hideLoader() {
+        const loader = document.getElementById("global-loader");
+        if (loader) loader.style.display = "none";
+    }
+
+    window.addEventListener("load", hideLoader);
+    window.addEventListener("pageshow", hideLoader); // Handles browser back/forward
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const forms = document.querySelectorAll("form");
+        forms.forEach(form => {
+            form.addEventListener("submit", () => {
+                const loader = document.getElementById("global-loader");
+                if (loader) loader.style.display = "flex";
+            });
+        });
+
+        // Optional: Show loader when navigating via links
+        const links = document.querySelectorAll("a[href]");
+        links.forEach(link => {
+            link.addEventListener("click", function (e) {
+                const target = link.getAttribute("target");
+                const href = link.getAttribute("href");
+                if (!target && href && !href.startsWith("#") && !href.startsWith("javascript:")) {
+                    const loader = document.getElementById("global-loader");
+                    if (loader) loader.style.display = "flex";
+                }
+            });
+        });
+    });
+</script>
+</html>

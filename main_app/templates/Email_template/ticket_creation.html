@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support Ticket Created - Spend Server</title>
+    {% load static %}
+    <link rel="icon" href="{% static 'Images/icon.png' %}" type="image/x-icon">
+    <style type="text/css">
+        /* Same CSS as original template */
+        /* Base Styles */
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #0f0f13;
+            color: #e0e0e0;
+        }
+
+        /* Email Container */
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #121218;
+            background-image: radial-gradient(circle at 25% 25%, rgba(113, 85, 249, 0.1) 0%, transparent 50%);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Header */
+        .header {
+            padding: 30px;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(113, 85, 249, 0.2) 0%, rgba(113, 85, 249, 0) 100%);
+            border-bottom: 1px solid rgba(113, 85, 249, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header:before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(113, 85, 249, 0.05) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+            z-index: 0;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+            position: relative;
+            z-index: 1;
+            display: inline-block;
+        }
+
+        .logo span {
+            color: rgb(113, 85, 249);
+        }
+
+        .tagline {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Content */
+        .content {
+            padding: 30px;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        .content:after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(113, 85, 249, 0.3), transparent);
+        }
+
+        h1 {
+            color: white;
+            font-size: 24px;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        p {
+            margin-bottom: 20px;
+            font-size: 16px;
+            color: rgba(224, 224, 224, 0.8);
+        }
+
+        .highlight {
+            background: rgba(113, 85, 249, 0.15);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: rgb(113, 85, 249);
+            font-weight: 500;
+        }
+
+        /* Ticket Info */
+        .ticket-info {
+            background: rgba(30, 30, 40, 0.5);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+            border: 1px solid rgba(113, 85, 249, 0.2);
+        }
+
+        .ticket-row {
+            display: flex;
+            margin-bottom: 12px;
+        }
+
+        .ticket-label {
+            font-weight: 600;
+            color: white;
+            width: 120px;
+        }
+
+        .ticket-value {
+            flex: 1;
+        }
+
+        .ticket-id {
+            font-size: 18px;
+            font-weight: 700;
+            color: rgb(113, 85, 249);
+        }
+
+        /* Button */
+        .button-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 14px 28px;
+            background: rgb(113, 85, 249);
+            color: white !important;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(113, 85, 249, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .button:hover {
+            background: rgba(113, 85, 249, 0.9);
+            box-shadow: 0 6px 20px rgba(113, 85, 249, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .button:before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(to bottom right,
+                    rgba(255, 255, 255, 0) 45%,
+                    rgba(255, 255, 255, 0.1) 50%,
+                    rgba(255, 255, 255, 0) 55%);
+            transform: rotate(30deg);
+            animation: shine 3s infinite;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 20px 30px;
+            text-align: center;
+            font-size: 13px;
+            color: rgba(224, 224, 224, 0.5);
+            background: rgba(15, 15, 19, 0.5);
+        }
+
+        .social-links {
+            margin: 15px 0;
+        }
+
+        .social-link {
+            display: inline-block;
+            margin: 0 8px;
+            color: rgba(224, 224, 224, 0.7) !important;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .social-link:hover {
+            color: rgb(113, 85, 249) !important;
+        }
+
+        .contact {
+            margin-top: 15px;
+            font-size: 12px;
+        }
+
+        /* Animations */
+        @keyframes rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes shine {
+            0% {
+                transform: translateX(-100%) translateY(-100%) rotate(30deg);
+            }
+
+            100% {
+                transform: translateX(100%) translateY(100%) rotate(30deg);
+            }
+        }
+
+        /* Responsive */
+        @media screen and (max-width: 480px) {
+            .email-container {
+                border-radius: 0;
+            }
+
+            .header,
+            .content {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+            
+            .ticket-row {
+                flex-direction: column;
+            }
+            
+            .ticket-label {
+                width: auto;
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="email-container">
+        <div class="header">
+            <a href="#" class="logo">Spend<span>Server</span></a>
+            <div class="tagline">Support Ticket Confirmation</div>
+        </div>
+
+        <div class="content">
+            <h1>Your Support Ticket Has Been Created</h1>
+
+            <p>Hello,</p>
+
+            <p>Thank you for reaching out to Spend Server support. We've received your request and a member of our team will get back to you shortly.</p>
+
+            <div class="ticket-info">
+                <div class="ticket-row">
+                    <div class="ticket-label">Ticket Number:</div>
+                    <div class="ticket-value ticket-id">#{{ticket_number}}</div>
+                </div>
+                
+                <div class="ticket-row">
+                    <div class="ticket-label">Subject:</div>
+                    <div class="ticket-value">{{ticket_subject}}</div>
+                </div>
+                
+                <div class="ticket-row">
+                    <div class="ticket-label">Created:</div>
+                    <div class="ticket-value">{{ticket_created_time}}</div>
+                </div>
+                
+                <div class="ticket-row">
+                    <div class="ticket-label">Status:</div>
+                    <div class="ticket-value"><span class="highlight">Open</span></div>
+                </div>
+
+            </div>
+
+            <p>We typically respond to support requests within <strong>24 hours</strong>. For urgent matters, please mention "URGENT" in your ticket subject.</p>
+
+            <p>You can view the status of your ticket at any time by visiting our support portal:</p>
+
+            <div class="button-container">
+                <a href="{{domain}}" class="button">View Ticket Status</a>
+            </div>
+
+            <p>For your reference, here's a copy of your original message:</p>
+            
+            <div style="background: rgba(30, 30, 40, 0.3); padding: 15px; border-radius: 6px; border-left: 3px solid rgb(113, 85, 249); margin: 20px 0;">
+                {{ticket_message}}
+            </div>
+
+            <p>If you need to add any additional information to this ticket, simply reply to this email.</p>
+
+            <p>Thank you for your patience,<br>The Spend Server Support Team</p>
+        </div>
+
+        <div class="footer">
+
+            <div class="contact">
+                Email: <a href="mailto:spendserver@gmail.com"
+                    style="color: rgba(224, 224, 224, 0.7) !important;">spendserver@gmail.com</a>
+            </div>
+
+            <div style="margin-top: 20px; font-size: 11px; color: rgba(224, 224, 224, 0.3);">
+                &copy; 2025 Spend Server. All rights reserved.<br>
+                This is an automated message - please do not reply directly to this email.
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

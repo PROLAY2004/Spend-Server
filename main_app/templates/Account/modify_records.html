@@ -1,0 +1,290 @@
+{% extends 'Account/base.html' %}
+
+{% block title %}Modify Records - Spend Server{% endblock %}
+{% block page_title %}Modify Records{% endblock %}
+{% block breadcrumbs %}Home / Modify Records{% endblock %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'CSS/Account/modify_record.css' %}">
+{% endblock %}
+{% block content %}
+<div class="modify-container">
+    {% if not request.GET %}
+    <!-- Search Form Page -->
+    <div class="form-container">
+        <h3 class="section-title">Search Records</h3>
+        <form method="GET">
+            <div class="form-group">
+                <label for="date">Date</label>
+                <input type="date" id="date" name="date" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label for="due_from">Due From</label>
+                <input type="text" id="due_from" name="due_from" class="form-control" placeholder="Enter name">
+            </div>
+
+            <div class="form-group">
+                <label for="description">Description</label>
+                <input type="text" id="description" name="description" class="form-control"
+                    placeholder="Enter description">
+            </div>
+
+            <div class="form-group">
+                <label for="status">Status</label>
+                <select id="status" name="status" class="form-control">
+                    <option value="">All Status</option>
+                    <option value="Paid">Paid</option>
+                    <option value="Non-Paid">Non-Paid</option>
+                </select>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search"></i> Search Records
+                </button>
+                <button type="reset" class="btn btn-outline">
+                    <i class="fas fa-undo"></i> Reset
+                </button>
+            </div>
+        </form>
+    </div>
+
+    {% else %}
+    <div class="search-summary">
+        <div class="search-header">
+            <h3>Search Results</h3>
+            <a href="/Dashboard/Modify/Data/{{id}}/" class="btn btn-outline btn-sm">
+                <i class="fas fa-edit"></i> Modify Search
+            </a>
+        </div>
+
+        {% if request.GET.date or request.GET.due_from or request.GET.description or request.GET.status %}
+        <div class="search-filters">
+            <h4>Active Filters:</h4>
+            <div class="filter-tags">
+                {% if request.GET.date %}
+                <span class="filter-tag">
+                    <span>Date:</span> {{ request.GET.date }}
+                </span>
+                {% endif %}
+                {% if request.GET.due_from %}
+                <span class="filter-tag">
+                    <span>Due From:</span> {{ request.GET.due_from }}
+                </span>
+                {% endif %}
+                {% if request.GET.description %}
+                <span class="filter-tag">
+                    <span>Description:</span> {{ request.GET.description }}
+                </span>
+                {% endif %}
+                {% if request.GET.status %}
+                <span class="filter-tag">
+                    <span>Status:</span> {{ request.GET.status }}
+                </span>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+<form method="POST" id="bulk-action-form">
+    <div class="bulk-actions-container">
+        
+            {% csrf_token %}
+            <input type="hidden" name="action" id="bulk-action" value="">
+            <input type="hidden" name="new_status" id="new-status" value="">
+            <input type="hidden" name="query_string" value="{{ request.GET.urlencode }}">
+
+            <div class="bulk-action-controls">
+                <div class="form-group">
+                    <select class="form-control" id="action-select">
+                        <option value="">Select Action</option>
+                        <option value="delete">Delete Selected</option>
+                        <option value="status">Change Status</option>
+                    </select>
+                </div>
+
+                <div class="form-group status-select-container" style="display: none;">
+                    <select class="form-control" id="status-select">
+                        <option value="">Select Status</option>
+                        <option value="Paid">Paid</option>
+                        <option value="Non-Paid">Non-Paid</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="apply-action" disabled>
+                    <i class="fas fa-check"></i> Apply
+                </button>
+            </div>
+        
+    </div>
+
+    <div class="table-container">
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th width="40px">
+                            <input type="checkbox" id="select-all">
+                        </th>
+                        <th>Date(DD-MM-YY)</th>
+                        <th>Description</th>
+                        <th>Spend Amount</th>
+                        <th>Orginal Amount</th>
+                        <th>Due From</th>
+                        <th>Due Amount</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in records reversed %}
+                    <tr>
+                        <td>
+                            <input type="checkbox" name="record_ids" value="{{ record.recid }}" class="record-checkbox">
+                        </td>
+                        <td>{{ record.Date|date:"d M, Y" }}</td>
+                        <td>{{ record.Description }}</td>
+                        <td>{{ record.Spend_Amount }}</td>
+                        <td>{{ record.Orginal_Debited_Amount }}</td>
+                        <td>{{ record.Due_From }}</td>
+                        <td>{{ record.Due_Amount }}</td>
+                        <td>{{ record.Status }}</td>
+                        <td>
+                            <div class="action-btns">
+                                <a class="action-btn edit-btn note-btn" data-note="{{ record.Notes }}">
+                                    <i class="far fa-sticky-note"></i>
+                                </a>
+                                <a href="/Dashboard/Edit/Data/{{ record.recid }}/{{id}}/" class="action-btn edit-btn">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" style="text-align: left;">No records found matching your criteria</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+</form>
+
+<!-- Note Dialog -->
+<div class="note-dialog">
+    <div class="note-dialog-content">
+        <button class="note-dialog-close">&times;</button>
+        <h3>Record Notes</h3>
+        <p id="note-content"></p>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Note dialog functionality
+        const noteBtns = document.querySelectorAll('.note-btn');
+        const noteDialog = document.querySelector('.note-dialog');
+        const noteContent = document.getElementById('note-content');
+        const noteCloseBtn = document.querySelector('.note-dialog-close');
+
+        noteBtns.forEach(btn => {
+            btn.addEventListener('click', function () {
+                const note = this.getAttribute('data-note') || 'No notes available for this record';
+                noteContent.textContent = note;
+                noteDialog.classList.add('active');
+            });
+        });
+
+        noteCloseBtn.addEventListener('click', function () {
+            noteDialog.classList.remove('active');
+        });
+
+        // Bulk actions functionality
+        const selectAllCheckbox = document.getElementById('select-all');
+        const recordCheckboxes = document.querySelectorAll('.record-checkbox');
+        const actionSelect = document.getElementById('action-select');
+        const statusSelectContainer = document.querySelector('.status-select-container');
+        const statusSelect = document.getElementById('status-select');
+        const applyBtn = document.getElementById('apply-action');
+        const bulkActionForm = document.getElementById('bulk-action-form');
+        const bulkActionInput = document.getElementById('bulk-action');
+        const newStatusInput = document.getElementById('new-status');
+
+        // Select all checkbox
+        selectAllCheckbox.addEventListener('change', function () {
+            recordCheckboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+            updateApplyButtonState();
+        });
+
+        // Individual record checkboxes
+        recordCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function () {
+                updateSelectAllCheckbox();
+                updateApplyButtonState();
+            });
+        });
+
+        // Action select change
+        actionSelect.addEventListener('change', function () {
+            if (this.value === 'status') {
+                statusSelectContainer.style.display = 'block';
+            } else {
+                statusSelectContainer.style.display = 'none';
+            }
+            updateApplyButtonState();
+        });
+
+        // Status select change
+        statusSelect.addEventListener('change', updateApplyButtonState);
+
+        // Form submission
+        bulkActionForm.addEventListener('submit', function (e) {
+            const selectedAction = actionSelect.value;
+            const selectedRecords = document.querySelectorAll('.record-checkbox:checked');
+
+            if (selectedRecords.length === 0) {
+                e.preventDefault();
+                showToast('Please select at least one record', 'error');
+                return;
+            }
+
+            if (selectedAction === 'status' && !statusSelect.value) {
+                e.preventDefault();
+                showToast('Please select a status', 'error');
+                return;
+            }
+
+            bulkActionInput.value = selectedAction;
+            newStatusInput.value = statusSelect.value;
+        });
+
+        function updateSelectAllCheckbox() {
+            const allChecked = Array.from(recordCheckboxes).every(checkbox => checkbox.checked);
+            selectAllCheckbox.checked = allChecked;
+        }
+
+        function updateApplyButtonState() {
+            const hasSelectedRecords = Array.from(recordCheckboxes).some(checkbox => checkbox.checked);
+            const actionSelected = actionSelect.value;
+            const statusValid = actionSelected !== 'status' || statusSelect.value;
+
+            applyBtn.disabled = !(hasSelectedRecords && actionSelected && statusValid);
+        }
+
+        // Toast notification function (assuming this exists from your existing code)
+        function showToast(message, type) {
+            // Your existing toast implementation
+        }
+    });
+</script>
+
+{% endblock %}
+{% endblock %}

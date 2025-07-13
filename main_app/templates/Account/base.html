@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>{% block title %}Spend Server{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'CSS/Account/base.css' %}">
+    <link rel="icon" href="{% static 'Images/icon.png' %}" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Toastify CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link rel="icon" href="{% static 'Images/icon.png' %}" type="image/x-icon">
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+    <div id="global-loader">
+        <div class="loader-spinner"></div>
+    </div>
+    
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo-container">
+                <i class="fa-solid fa-code"></i>
+                <h1>Spend Server</h1>
+            </div>
+
+            <nav class="nav-menu">
+                <ul>
+                    <li
+                        class="nav-item {% if '/Dashboard/Home/' in request.path or '/Dashboard/Home/' in path %}active{% endif %}">
+                        <a href="/Dashboard/Home/{{id}}/">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item {% if '/Dashboard/Insert/Data/' in request.path %}active{% endif %}">
+                        <a href="/Dashboard/Insert/Data/{{id}}/">
+                            <i class="fas fa-plus-circle"></i>
+                            <span>Add Record</span>
+                        </a>
+                    </li>
+                    <li
+                        class="nav-item {% if '/Dashboard/View/Data/' in request.path or '/Dashboard/View/Data/' in path %}active{% endif %}">
+                        <a href="/Dashboard/View/Data/{{id}}/">
+                            <i class="fas fa-list"></i>
+                            <span>View Records</span>
+                        </a>
+                    </li>
+                    <li class="nav-item {% if '/Dashboard/Filter/Data/' in request.path or '/Dashboard/Filter/Data/' in path %}active{% endif %}">
+                        <a href="/Dashboard/Filter/Data/{{id}}/">
+                            <i class="fas fa-filter"></i>
+                            <span>Filter Records</span>
+                        </a>
+                    </li>
+                    <li class="nav-item {% if '/Dashboard/Modify/Data/' in request.path or '/Dashboard/Modify/Data/' in path %}active{% endif %}">
+                        <a href="/Dashboard/Modify/Data/{{id}}/">
+                            <i class="fas fa-edit"></i>
+                            <span>Modify Records</span>
+                        </a>
+                    </li>
+                    <li class="nav-item {% if '/Dashboard/Settings/' in request.path %}active{% endif %}">
+                        <a href="/Dashboard/Settings/{{id}}/">
+                            <i class="fas fa-cog"></i>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                    <li class="nav-item {% if '/Dashboard/Support/' in request.path %} active{% endif %}">
+                        <a href="/Dashboard/Support/{{id}}/">
+                            <i class="fas fa-question-circle"></i>
+                            <span>Help</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="user-profile">
+                <div class="user-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="user-info">
+                    <span class="username" style="overflow-x: auto;">{{ user }}</span>
+                    <a href="/Auth/Logout/" class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left" style="display: flex; gap: 20px;">
+                    <!-- Hamburger menu for mobile -->
+                    <button class="mobile-menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="grp">
+                        <h2>{% block page_title %}Dashboard{% endblock %}</h2>
+                        <p class="breadcrumbs">{% block breadcrumbs %}Home{% endblock %}</p>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+
+    <!-- Toastify JS -->
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="{% static 'JS/Account/base.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+<script>
+    // Hide loader after page fully loads or comes from bfcache
+    function hideLoader() {
+        const loader = document.getElementById("global-loader");
+        if (loader) loader.style.display = "none";
+    }
+
+    window.addEventListener("load", hideLoader);
+    window.addEventListener("pageshow", hideLoader); // Handles browser back/forward
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const forms = document.querySelectorAll("form");
+        forms.forEach(form => {
+            form.addEventListener("submit", () => {
+                const loader = document.getElementById("global-loader");
+                if (loader) loader.style.display = "flex";
+            });
+        });
+
+        // Optional: Show loader when navigating via links
+        const links = document.querySelectorAll("a[href]");
+        links.forEach(link => {
+            link.addEventListener("click", function (e) {
+                const target = link.getAttribute("target");
+                const href = link.getAttribute("href");
+                if (!target && href && !href.startsWith("#") && !href.startsWith("javascript:")) {
+                    const loader = document.getElementById("global-loader");
+                    if (loader) loader.style.display = "flex";
+                }
+            });
+        });
+    });
+</script>
+
+</html>

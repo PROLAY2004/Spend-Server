@@ -1,0 +1,649 @@
+{% extends 'Account/base.html' %}
+
+{% block title %}Filter Details - Spend Server{% endblock %}
+{% block page_title %}Filter Details{% endblock %}
+{% block breadcrumbs %}Home / Filter Details{% endblock %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'CSS/Account/filter_details.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="filter-container">
+    {% if not request.GET %}
+    <!-- Search Form Page -->
+    <div class="form-container">
+        <h3 class="section-title">Filter Records</h3>
+        <form method="GET">
+            <div class="form-group">
+                <label for="date">Date</label>
+                <input type="date" id="date" name="date" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label for="due_from">Due From</label>
+                <input type="text" id="due_from" name="due_from" class="form-control" placeholder="Enter name">
+            </div>
+
+            <div class="form-group">
+                <label for="description">Description</label>
+                <input type="text" id="description" name="description" class="form-control"
+                    placeholder="Enter description">
+            </div>
+
+            <div class="form-group">
+                <label for="status">Status</label>
+                <select id="status" name="status" class="form-control">
+                    <option value="">All Status</option>
+                    <option value="Paid">Paid</option>
+                    <option value="Non-Paid">Non-Paid</option>
+                </select>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search"></i> Filter Records
+                </button>
+                <button type="reset" class="btn btn-outline">
+                    <i class="fas fa-undo"></i> Reset
+                </button>
+            </div>
+        </form>
+    </div>
+
+    {% else %}
+    <div class="search-summary">
+        <div class="search-header">
+            <h3>Filter Results</h3>
+            <a href="/Dashboard/Filter/Data/{{id}}/" class="btn btn-outline btn-sm">
+                <i class="fas fa-edit"></i> Modify Filter
+            </a>
+        </div>
+
+        {% if request.GET.date or request.GET.due_from or request.GET.description or request.GET.status %}
+        <div class="search-filters">
+            <h4>Active Filters:</h4>
+            <div class="filter-tags">
+                {% if request.GET.date %}
+                <span class="filter-tag">
+                    <span>Date:</span> {{ request.GET.date }}
+                </span>
+                {% endif %}
+                {% if request.GET.due_from %}
+                <span class="filter-tag">
+                    <span>Due From:</span> {{ request.GET.due_from }}
+                </span>
+                {% endif %}
+                {% if request.GET.description %}
+                <span class="filter-tag">
+                    <span>Description:</span> {{ request.GET.description }}
+                </span>
+                {% endif %}
+                {% if request.GET.status %}
+                <span class="filter-tag">
+                    <span>Status:</span> {{ request.GET.status }}
+                </span>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="table-container">
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th width="40px">Action</th>
+                        <th>Date(DD-MM-YY)</th>
+                        <th>Description</th>
+                        <th>Spend Amount</th>
+                        <th>Original Amount</th>
+                        <th>Due From</th>
+                        <th>Due Amount</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in records reversed %}
+                    <tr data-id="{{ record.recid }}" data-due-amount="{{ record.Due_Amount }}"
+                        data-status="{{ record.Status }}">
+                        <td>
+                            <button class="action-btn remove-btn" data-id="{{ record.recid }}">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </td>
+                        <td>{{ record.Date|date:"d M, Y" }}</td>
+                        <td>{{ record.Description }}</td>
+                        <td>{{ record.Spend_Amount }}</td>
+                        <td>{{ record.Orginal_Debited_Amount }}</td>
+                        <td>{{ record.Due_From }}</td>
+                        <td class="due-amount">{{ record.Due_Amount }}</td>
+                        <td>{{ record.Status }}</td>
+                        <td>
+                            <div class="action-btns">
+                                <a class="action-btn edit-btn note-btn" data-note="{{ record.Notes }}">
+                                    <i class="far fa-sticky-note"></i>
+                                </a>
+                                <a href="/Dashboard/Edit/Data/{{ record.recid }}/{{id}}/" class="action-btn edit-btn">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a class="action-btn delete-btn"
+                                    data-delete-url="/Dashboard/Delete/Data/{{ record.recid }}/{{ id }}/">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" style="text-align: left;">No records found matching your criteria</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="summary-container">
+        <div class="summary-card">
+            <h4>Total Due Amount (Non-Paid)</h4>
+            <div class="summary-value" id="total-due-amount">0.00</div>
+        </div>
+        <button class="btn btn-primary" id="print-invoice-btn">
+            <i class="fas fa-print"></i> Print Invoices
+        </button>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Note Dialog -->
+<div class="note-dialog">
+    <div class="note-dialog-content">
+        <button class="note-dialog-close">&times;</button>
+        <h3>Record Notes</h3>
+        <p id="note-content"></p>
+    </div>
+</div>
+
+<!-- Delete Confirmation Dialog -->
+<div id="delete-dialog" class="note-dialog">
+    <div class="note-dialog-content">
+        <button class="note-dialog-close delete-dialog-close">&times;</button>
+        <h3>Confirm Deletion</h3>
+        <p>Are you sure you want to delete this record?</p>
+        <div style="margin-top: 15px; display: flex; justify-content: flex-end; gap: 10px;">
+            <button id="confirm-delete-btn" class="btn btn-primary">Yes, Delete</button>
+            <button class="btn btn-outline delete-dialog-close">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Print Invoice Dialog -->
+<div class="print-dialog">
+    <div class="print-dialog-content">
+        <button class="print-dialog-close">&times;</button>
+        <h3>Select Records to Print</h3>
+        <div class="print-table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th width="40px">
+                            <input type="checkbox" id="print-select-all">
+                        </th>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th>Due Amount</th>
+                    </tr>
+                </thead>
+                <tbody id="print-table-body">
+                    <!-- Will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+        <div class="print-actions">
+            <button class="btn btn-primary" id="print-selected">
+                <i class="fas fa-print"></i> Print Selected
+            </button>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Note dialog functionality
+        const noteBtns = document.querySelectorAll('.note-btn');
+        const noteDialog = document.querySelector('.note-dialog');
+        const noteContent = document.getElementById('note-content');
+        const noteCloseBtn = document.querySelector('.note-dialog-close');
+
+        noteBtns.forEach(btn => {
+            btn.addEventListener('click', function () {
+                const note = this.getAttribute('data-note') || 'No notes available for this record';
+                noteContent.textContent = note;
+                noteDialog.classList.add('active');
+            });
+        });
+
+        noteCloseBtn.addEventListener('click', function () {
+            noteDialog.classList.remove('active');
+        });
+
+
+        // Remove row functionality (temporary)
+        document.addEventListener('click', function (e) {
+            // Handle remove action (click on X icon)
+            if (e.target.classList.contains('fa-times') || e.target.closest('.remove-btn:not(.undo-btn)')) {
+                const btn = e.target.classList.contains('fa-times') ? e.target.parentElement : e.target;
+                const row = btn.closest('tr');
+
+                // Mark row as removed
+                row.classList.add('removed');
+
+                // Change button to undo state
+                btn.innerHTML = '<i class="fas fa-undo"></i>';
+                btn.classList.add('undo-btn');
+
+                // Recalculate totals
+                calculateTotalDue();
+            }
+
+            // Handle undo action (click on undo icon or button)
+            if (e.target.classList.contains('fa-undo') || e.target.closest('.undo-btn')) {
+                const btn = e.target.classList.contains('fa-undo') ? e.target.parentElement : e.target;
+                const row = btn.closest('tr');
+
+                // Restore row
+                row.classList.remove('removed');
+
+                // Change button back to remove state
+                btn.innerHTML = '<i class="fas fa-times"></i>';
+                btn.classList.remove('undo-btn');
+
+                // Recalculate totals
+                calculateTotalDue();
+            }
+        });
+
+
+        //delete logic
+        const deleteButtons = document.querySelectorAll('.delete-btn');
+        const deleteDialog = document.getElementById('delete-dialog');
+        const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+        const deleteCloseButtons = document.querySelectorAll('.delete-dialog-close');
+
+        let deleteUrl = "";
+
+        deleteButtons.forEach(btn => {
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                deleteUrl = this.getAttribute('data-delete-url');
+                deleteDialog.classList.add('active');
+            });
+        });
+
+        confirmDeleteBtn.addEventListener('click', function () {
+            if (deleteUrl) {
+                window.location.href = deleteUrl;
+            }
+        });
+
+        deleteCloseButtons.forEach(btn => {
+            btn.addEventListener('click', function () {
+                deleteDialog.classList.remove('active');
+            });
+        });
+
+        deleteDialog.addEventListener('click', function (e) {
+            if (e.target === deleteDialog) {
+                deleteDialog.classList.remove('active');
+            }
+        });
+
+        // Calculate total due amount for Non-Paid records
+        function calculateTotalDue() {
+            let total = 0;
+            document.querySelectorAll('tbody tr:not(.removed)').forEach(row => {
+                const status = row.getAttribute('data-status');
+                const dueAmount = parseFloat(row.getAttribute('data-due-amount')) || 0;
+                if (status === 'Non-Paid') {
+                    total += dueAmount;
+                }
+            });
+            document.getElementById('total-due-amount').textContent = total.toFixed(2);
+        }
+
+        // Initial calculation
+        calculateTotalDue();
+
+        // Print invoice functionality
+        const printInvoiceBtn = document.getElementById('print-invoice-btn');
+        const printDialog = document.querySelector('.print-dialog');
+        const printDialogClose = document.querySelector('.print-dialog-close');
+        const printSelectAll = document.getElementById('print-select-all');
+        const printTableBody = document.getElementById('print-table-body');
+        const printActions = document.querySelector('.print-actions');
+
+        // Clear existing buttons and add print button
+        printActions.innerHTML = '';
+        const printButton = document.createElement('button');
+        printButton.id = 'print-selected';
+        printButton.className = 'btn btn-primary';
+        printButton.innerHTML = '<i class="fas fa-print"></i> Print Selected';
+        printActions.appendChild(printButton);
+
+        // Open print dialog
+        printInvoiceBtn.addEventListener('click', function () {
+            // Reset previous selections
+            printSelectAll.checked = true;
+            printTableBody.innerHTML = '';
+
+            // Populate print table
+            document.querySelectorAll('tbody tr:not(.removed)').forEach(row => {
+                const id = row.getAttribute('data-id');
+                const date = row.cells[1].textContent;
+                const description = row.cells[2].textContent;
+                const dueAmount = row.cells[6].textContent;
+                const status = row.getAttribute('data-status');
+                const dueFrom = row.cells[5].textContent;
+
+                const tr = document.createElement('tr');
+                tr.setAttribute('data-status', status);
+                tr.setAttribute('data-due-from', dueFrom);
+                tr.innerHTML = `
+            <td><input type="checkbox" class="print-record-checkbox" checked value="${id}"></td>
+            <td>${date}</td>
+            <td>${description}</td>
+            <td>${dueAmount}</td>
+        `;
+                printTableBody.appendChild(tr);
+            });
+
+            printDialog.classList.add('active');
+        });
+
+        // Close print dialog
+        printDialogClose.addEventListener('click', function () {
+            printDialog.classList.remove('active');
+        });
+
+        // Select all for print
+        printSelectAll.addEventListener('change', function () {
+            const checkboxes = document.querySelectorAll('.print-record-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+        });
+
+        // Print selected invoices
+        printButton.addEventListener('click', function () {
+            const selectedRecords = [];
+            const selectedCheckboxes = document.querySelectorAll('.print-record-checkbox:checked');
+
+            // Check if at least one record is selected
+            if (selectedCheckboxes.length === 0) {
+                showToast('Please select at least one record', 'error');
+                return;
+            }
+
+            // Collect selected records data
+            selectedCheckboxes.forEach(checkbox => {
+                const row = checkbox.closest('tr');
+                selectedRecords.push({
+                    date: row.cells[1].textContent,
+                    description: row.cells[2].textContent,
+                    dueAmount: row.cells[3].textContent,
+                    status: row.getAttribute('data-status'),
+                    dueFrom: row.getAttribute('data-due-from')
+                });
+            });
+
+            // Security Check 1: All records have same status
+            const firstStatus = selectedRecords[0].status;
+            const mixedStatus = selectedRecords.some(record => record.status !== firstStatus);
+            if (mixedStatus) {
+                showToast('Cannot mix Paid and Non-Paid records in one invoice', 'error');
+                return;
+            }
+
+            // Security Check 2: All records have same Due From name
+            const firstDueFrom = selectedRecords[0].dueFrom;
+            const mixedDueFrom = selectedRecords.some(record => record.dueFrom !== firstDueFrom);
+            if (mixedDueFrom) {
+                showToast('All records must be for the same customer', 'error');
+                return;
+            }
+
+            // Generate invoice HTML
+            const totalAmount = selectedRecords.reduce((sum, record) => sum + parseFloat(record.dueAmount), 0).toFixed(2);
+            const invoiceHTML = `
+        <!DOCTYPE html>
+        <html lang="en">
+            <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+            <title>Invoice - ${selectedRecords[0].dueFrom}</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    background-color: #FFF;
+                    color: #333;
+                    padding: 20px;
+                }
+                .invoice {
+                    width: 80%;
+                    margin: auto;
+                    border: 1px solid #CCC;
+                    padding: 20px;
+                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                    background-color: #F9F9F9;
+                }
+                .invoice h2 {
+                    border-bottom: 1px solid #CCC;
+                    padding-bottom: 10px;
+                }
+                .invoice p {
+                    margin: 10px 0;
+                }
+                .total-due {
+                    font-weight: bold;
+                }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 20px;
+                }
+                table, th, td {
+                    border: 1px solid #CCC;
+                    padding: 8px;
+                    text-align: left;
+                }
+                th {
+                    background-color: #f2f2f2;
+                }
+                tr:nth-child(even) {
+                    background-color: #f2f2f2;
+                }
+                .button-group {
+                    margin-top: 20px;
+                    text-align: center;
+                }
+                .button-group button {
+                    padding: 10px 20px;
+                    font-size: 16px;
+                    cursor: pointer;
+                    background-color: green;
+                    color: white;
+                    border: none;
+                    border-radius: 5px;
+                    margin: 0 10px;
+                }
+                .button-group button:hover {
+                    background-color: darkgreen;
+                }
+                @media print {
+                    .button-group {
+                        display: none;
+                    }
+                }
+                @media (max-width: 600px) {
+                    .invoice {
+                        width: 100%;
+                        padding: 10px;
+                    }
+                    .button-group button {
+                        padding: 8px 16px;
+                        font-size: 14px;
+                    }
+                }
+                .modal {
+                    display: none;
+                    position: fixed;
+                    z-index: 1;
+                    left: 0;
+                    top: 0;
+                    width: 100%;
+                    height: 100%;
+                    overflow: auto;
+                    background-color: rgba(0,0,0,0.4);
+                    padding-top: 60px;
+                }
+                .modal-content {
+                    background-color: #fefefe;
+                    margin: 5% auto;
+                    padding: 20px;
+                    border: 1px solid #888;
+                    width: 80%;
+                    max-width: 500px;
+                }
+                .close {
+                    color: #aaa;
+                    float: right;
+                    font-size: 28px;
+                    font-weight: bold;
+                }
+                .close:hover,
+                .close:focus {
+                    color: black;
+                    text-decoration: none;
+                    cursor: pointer;
+                }
+                .share-options {
+                    text-align: center;
+                }
+                .share-options a {
+                    display: block;
+                    margin: 10px 0;
+                    padding: 10px;
+                    font-size: 16px;
+                    color: white;
+                    background-color: #4CAF50;
+                    text-decoration: none;
+                    border-radius: 5px;
+                }
+                .share-options a:hover {
+                    background-color: #45a049;
+                }
+            </style>
+</head>
+
+<body>
+
+    <div class="invoice" id="invoiceContent">
+        <h2>Invoice Details</h2>
+        <p><strong>Print Date:</strong> ${new Date().toLocaleDateString()}</p>
+
+        <p><strong>Name:</strong> ${selectedRecords[0].dueFrom}</p>
+        <p><strong>Status:</strong> ${selectedRecords[0].status}</p>
+
+        <h2>Filtered Data</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Reason</th>
+                    <th>Due Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                ${selectedRecords.map(record => `
+                <tr>
+                    <td>${record.date}</td>
+                    <td>${record.description}</td>
+                    <td>${record.dueAmount}</td>
+                </tr>
+                `).join('')}
+                <tr class='total-due'>
+                    <td colspan='2'>Total Due:</td>
+                    <td>${totalAmount}</td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+
+    <div class="button-group">
+        <button class="print-button" onclick="window.print()">Print Invoice</button>
+    </div>
+
+</body>
+
+</html>`;
+
+// Open print window
+const printWindow = window.open('', '_blank');
+printWindow.document.write(invoiceHTML);
+printWindow.document.close();
+
+// Close the selection dialog
+printDialog.classList.remove('active');
+});
+function showToast(message, type = 'info') {
+    // Create the toast container if it doesn't exist
+    let toastContainer = document.getElementById('toast-container');
+    if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.id = 'toast-container';
+        toastContainer.style.position = 'fixed';
+        toastContainer.style.top = '20px';
+        toastContainer.style.right = '20px';
+        toastContainer.style.zIndex = '9999';
+        document.body.appendChild(toastContainer);
+    }
+
+    // Create toast
+    const toast = document.createElement('div');
+    toast.textContent = message;
+    toast.style.backgroundColor = type === 'error' ? '#e74c3c' : '#2ecc71';
+    toast.style.color = '#fff';
+    toast.style.padding = '10px 20px';
+    toast.style.marginTop = '10px';
+    toast.style.borderRadius = '5px';
+    toast.style.boxShadow = '0 2px 6px rgba(0,0,0,0.2)';
+    toast.style.opacity = '0';
+    toast.style.transition = 'opacity 0.3s ease';
+
+    toastContainer.appendChild(toast);
+
+    // Show toast
+    setTimeout(() => {
+        toast.style.opacity = '1';
+    }, 100);
+
+    // Remove toast after 3 seconds
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => {
+            toast.remove();
+        }, 300);
+    }, 3000);
+}
+
+});
+</script>
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,266 @@
+{% extends 'Account/base.html' %}
+
+{% block title %}Settings - Spend Server{% endblock %}
+{% block page_title %}Settings{% endblock %}
+{% block breadcrumbs %}Home / Settings{% endblock %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'CSS/Account/settings.css' %}">
+{% endblock %}
+{% block content %}
+<div class="settings-container">
+    <div class="settings-tabs">
+        <div class="settings-nav">
+            <button class="settings-nav-btn active" data-tab="profile">Profile</button>
+            <button class="settings-nav-btn" data-tab="privacy">Privacy & Policy</button>
+            <button class="settings-nav-btn" data-tab="security">Security</button>
+        </div>
+
+        <div class="settings-content">
+            <div class="settings-tab active" id="profile-tab">
+                <form class="settings-form" method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="full-name">Full Name</label>
+                        <input type="text" name="username" id="full-name" class="form-control"
+                            value="{{ userdetails.Name }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" class="form-control" value="{{ userdetails.Email }}" disabled>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="mobile">Mobile Number</label>
+                        <input type="tel" id="mobile" name="usernum" class="form-control" value="{{userdetails.Mobile}}"
+                            placeholder="Enter your mobile number">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="join-date">Member Since</label>
+                        <input type="text" id="join-date" class="form-control" value="{{ userdetails.Creation_Time }}"
+                            disabled>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Update Profile
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="settings-tab" id="privacy-tab">
+                <div class="privacy-content">
+                    <h4>Data Usage Policy</h4>
+                    <p>To provide you with a smooth experience, our website collects and uses your data in the following
+                        ways:</p>
+
+                    <ul class="privacy-list">
+                        <li><i class="fas fa-check-circle"></i> All your expense records are tracked and analyzed to
+                            provide better insights</li>
+                        <li><i class="fas fa-check-circle"></i> We use your transaction patterns to offer personalized
+                            recommendations</li>
+                        <li><i class="fas fa-check-circle"></i> Your data helps us improve our services and develop new
+                            features</li>
+                    </ul>
+
+                    <div class="subscription-notice">
+                        <h4><i class="fas fa-exclamation-circle"></i> Free Tier Limitations</h4>
+                        <p>After reaching a certain number of records, you'll need to subscribe to continue accessing
+                            your full history. Our free tier includes:</p>
+
+                        <ul>
+                            <li>Up to 1000 expense records</li>
+                            <li>Basic analytics and reports</li>
+                            <li>Email notifications for important updates</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-tab" id="security-tab">
+                <div class="security-sessions">
+                    <h4>Sessions History</h4>
+                    <p id="security">Past devices you've logged in from.</p>
+
+                    <div class="sessions-list">
+                        {% for i in sessions %}
+                        {% if i.Device_Type == 'Mobile' %}
+                        <div class="session-item current">
+                            <div class="session-info">
+                                <i class="fas fa-mobile-alt"></i>
+                                <div>
+                                    <strong>{{i.OS}} {{i.Device_Type}}</strong>
+                                    <small>{{i.Browser}}</small>
+                                    <small>{{i.Network_ip}} - {{i.Log_Time}}</small>
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="session-item current">
+                            <div class="session-info">
+                                <i class="fas fa-desktop"></i>
+                                <div>
+                                    <strong>{{i.OS}} {{i.Device_Type}}</strong>
+                                    <small>{{i.Browser}}</small>
+                                    <small>{{i.Network_ip}} - {{i.Log_Time}}</small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="text-center mt-3">
+                        <div class="session-actions">
+                            <button class="btn btn-outline" id="show-all-sessions-btn">
+                                <i class="fas fa-eye"></i> View All History
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="account-deletion">
+                    <h4>Delete Account</h4>
+                    <p class="warning-text">
+                        <i class="fas fa-exclamation-triangle"></i> This action is irreversible. All your data will be
+                        permanently deleted.
+                    </p>
+
+                    <button id="delete-account-btn" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Delete My Account
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Show All Sessions Modal -->
+<div id="all-sessions-modal" class="note-dialog">
+    <div class="note-dialog-content large">
+        <button class="note-dialo-close">&times;</button>
+        <h3>Full Session History</h3>
+        <div class="sessions-list hide-scroll"
+            style="max-height: 230px; overflow-y: auto; display: flex; flex-direction: column;">
+            {% for i in all_sessions %}
+            <div class="session-item">
+                <div class="session-info">
+                    {% if i.Device_Type == 'Mobile' %}
+                    <i class="fas fa-mobile-alt"></i>
+                    {% else %}
+                    <i class="fas fa-desktop"></i>
+                    {% endif %}
+                    <div>
+                        <strong>{{i.OS}} {{i.Device_Type}}</strong>
+                        <small>{{i.Browser}}</small>
+                        <small>{{i.Network_ip}} - {{i.Log_Time}}</small>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Delete Account Confirmation Modal -->
+<div id="delete-account-modal" class="note-dialog">
+    <div class="note-dialog-content">
+        <button class="note-dialog-close">&times;</button>
+        <h3>Confirm Account Deletion</h3>
+        <p>Are you sure you want to delete your account? This action will:</p>
+        <ul>
+            <li>Permanently delete all your data</li>
+            <li>Cancel any active subscriptions</li>
+            <li>Remove access to all services</li>
+        </ul>
+        
+        <div class="modal-actions">
+            <a href="/Dashboard/Delete/User/{{id}}/" id="confirm-delete" class="btn btn-danger">Delete Account</a>
+            <button id="cancel-delete" class="btn btn-outline">Cancel</button>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Settings tab functionality
+        const settingsNavBtns = document.querySelectorAll('.settings-nav-btn');
+        const settingsTabs = document.querySelectorAll('.settings-tab');
+
+        settingsNavBtns.forEach(btn => {
+            btn.addEventListener('click', function () {
+                const tabId = this.getAttribute('data-tab');
+
+                // Remove active class from all buttons and tabs
+                settingsNavBtns.forEach(btn => btn.classList.remove('active'));
+                settingsTabs.forEach(tab => tab.classList.remove('active'));
+
+                // Add active class to clicked button and corresponding tab
+                this.classList.add('active');
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+            });
+        });
+
+        // Delete account modal functionality
+        const deleteAccountBtn = document.getElementById('delete-account-btn');
+        const deleteModal = document.getElementById('delete-account-modal');
+        const closeModal = document.querySelector('.note-dialog-close');
+        const cancelDelete = document.getElementById('cancel-delete');
+
+        if (deleteAccountBtn) {
+            deleteAccountBtn.addEventListener('click', function () {
+                deleteModal.classList.add('active');
+            });
+        }
+
+        if (closeModal) {
+            closeModal.addEventListener('click', function () {
+                deleteModal.classList.remove('active');
+            });
+        }
+
+        if (cancelDelete) {
+            cancelDelete.addEventListener('click', function () {
+                deleteModal.classList.remove('active');
+            });
+        }
+
+        // Confirm delete action
+        const confirmDelete = document.getElementById('confirm-delete');
+        if (confirmDelete) {
+            confirmDelete.addEventListener('click', function () {
+                // Here you would typically make an AJAX call to delete the account
+                deleteModal.classList.remove('active');
+            });
+        }
+    });
+
+
+    // Show All Sessions Modal
+    const showAllSessionsBtn = document.getElementById('show-all-sessions-btn');
+    const allSessionsModal = document.getElementById('all-sessions-modal');
+
+    if (showAllSessionsBtn) {
+        showAllSessionsBtn.addEventListener('click', () => {
+            allSessionsModal.classList.add('active');
+        });
+    }
+
+    const closeAllSessions = allSessionsModal.querySelector('.note-dialo-close');
+    if (closeAllSessions) {
+        closeAllSessions.addEventListener('click', () => {
+            allSessionsModal.classList.remove('active');
+        });
+    }
+
+</script>
+{% endblock %}
+
+{% endblock %}

@@ -1,0 +1,470 @@
+{% extends 'Account/base.html' %}
+
+{% block title %}Help & Support - Spend Server{% endblock %}
+{% block page_title %}Help & Support{% endblock %}
+{% block breadcrumbs %}Home / Help{% endblock %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'CSS/Account/help.css' %}">
+{% endblock %}
+{% block content %}
+<div class="help-container">
+    <div class="help-sections">
+        <div class="help-sidebar">
+            <h3>Categories</h3>
+            <div class="gr">
+                <div class="help-categories">
+                    <ul>
+                        <li class="active"><a href="#getting-started">Getting Started</a></li>
+                        <li><a href="#records">Records Management</a></li>
+                        <li><a href="#invoices">Invoices</a></li>
+                        <li><a href="#account">Account</a></li>
+                        <li><a href="#faq">FAQs</a></li>
+                    </ul>
+                </div>
+
+                <div class="contact-support">
+                    <span class="border">
+                        <h4>Need More Help?</h4>
+                        <p>Our support team is ready to assist you.</p>
+                        {% if isAdmin %}
+                        <a href="/Dashboard/Support/Ticket/Admin/{{id}}/" class="btn btn-outline" style="padding: 5%;">
+                            <i class="fas fa-headset"></i> View Tickets
+                        </a>
+                        {% else %}
+                        <a href="/Dashboard/Support/Ticket/{{id}}/" class="btn btn-outline" style="padding: 5%;">
+                            <i class="fas fa-headset"></i> Contact US
+                        </a>
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="help-content">
+            <!-- Getting Started -->
+            <div class="help-article active" id="getting-started">
+                <div class="article-header">
+                    <h3><i class="fas fa-rocket"></i> Getting Started</h3>
+                </div>
+
+                <div class="article-content">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <div class="feature-content">
+                            <h4>Track Expenses Easily</h4>
+                            <p>Record daily spending with details like amount, description, and payment status.</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-file-invoice-dollar"></i>
+                        </div>
+                        <div class="feature-content">
+                            <h4>Manage Dues</h4>
+                            <p>Keep track of money owed to you with our due tracking system.</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                        <div class="feature-content">
+                            <h4>Analyze Spending</h4>
+                            <p>View insightful reports to understand your spending patterns.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Records Management -->
+            <div class="help-article" id="records">
+                <div class="article-header">
+                    <h3><i class="fas fa-database"></i> Records Management</h3>
+                </div>
+
+                <div class="article-content">
+                    <div class="content-tabs">
+                        <div class="tab-nav">
+                            <button class="tab-btn active" data-tab="add-records">Adding</button>
+                            <button class="tab-btn" data-tab="view-records">Viewing</button>
+                            <button class="tab-btn" data-tab="filter-records">Filtering</button>
+                            <button class="tab-btn" data-tab="modify-records">Modifying</button>
+                        </div>
+
+                        <div class="tab-content active" id="add-records">
+                            <h4>Adding Expense Records</h4>
+                            <div class="form-field-example">
+                                <div class="field">
+                                    <label>Description</label>
+                                    <div class="example">"Mobile recharge", "Dinner with friends"</div>
+                                </div>
+                                <div class="field">
+                                    <label>Amounts</label>
+                                    <div class="example">Spend: ₹200 | Debited: ₹180 (after ₹20 cashback)</div>
+                                </div>
+                                <div class="field">
+                                    <label>Person</label>
+                                    <div class="example">Your name for personal expenses, friend's name for shared</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-content" id="view-records">
+                            <h4>Viewing Your Records</h4>
+                            <ul class="feature-list">
+                                <li><i class="fas fa-sort"></i> Sort by any column</li>
+                                <li><i class="fas fa-search"></i> Quick search functionality</li>
+                                <li><i class="fas fa-calculator"></i> Automatic totals calculation</li>
+                            </ul>
+                        </div>
+
+                        <div class="tab-content" id="filter-records">
+                            <h4>Filtering Options</h4>
+                            <div class="filter-options">
+                                <div class="option">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>Date Range</span>
+                                </div>
+                                <div class="option">
+                                    <i class="fas fa-user"></i>
+                                    <span>Person</span>
+                                </div>
+                                <div class="option">
+                                    <i class="fas fa-tag"></i>
+                                    <span>Description</span>
+                                </div>
+                                <div class="option">
+                                    <i class="fas fa-indian-rupee-sign"></i>
+                                    <span>Amount</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-content" id="modify-records">
+                            <h4>Modifying Records</h4>
+                            <div class="action-cards">
+                                <div class="action-card">
+                                    <div class="action-icon edit">
+                                        <i class="fas fa-pen"></i>
+                                    </div>
+                                    <h5>Edit</h5>
+                                    <p>Update any record details</p>
+                                </div>
+                                <div class="action-card">
+                                    <div class="action-icon delete">
+                                        <i class="fas fa-trash"></i>
+                                    </div>
+                                    <h5>Delete</h5>
+                                    <p>Remove unwanted records</p>
+                                </div>
+                                <div class="action-card">
+                                    <div class="action-icon bulk">
+                                        <i class="fas fa-tasks"></i>
+                                    </div>
+                                    <h5>Bulk Actions</h5>
+                                    <p>Modify multiple records at once</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Invoices -->
+            <div class="help-article" id="invoices">
+                <div class="article-header">
+                    <h3><i class="fas fa-file-invoice"></i> Invoices</h3>
+                </div>
+
+                <div class="article-content">
+                    <div class="steps-container">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h5>Filter Records</h5>
+                                <p>Select records by person or other criteria</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h5>Select Items</h5>
+                                <p>Choose specific transactions using checkboxes</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h5>Generate</h5>
+                                <p>Click "Print Invoice" to create your document</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="invoice-preview">
+                        <div class="preview-header">
+                            <h5>Sample Invoice</h5>
+                            <div class="preview-amount">₹1,250</div>
+                        </div>
+                        <div class="preview-details">
+                            <div class="preview-row">
+                                <span>Date:</span>
+                                <span>15 Jul 2024</span>
+                            </div>
+                            <div class="preview-row">
+                                <span>To:</span>
+                                <span>John Doe</span>
+                            </div>
+                            <div class="preview-row">
+                                <span>Status:</span>
+                                <span class="status pending">Non-Paid</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Account -->
+            <div class="help-article" id="account">
+                <div class="article-header">
+                    <h3><i class="fas fa-user-cog"></i> Account Settings</h3>
+                </div>
+
+                <div class="article-content">
+                    <div class="settings-card security">
+                        <div class="settings-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="settings-content">
+                            <h4>Security</h4>
+                            <ul>
+                                <li>Login with OTP</li>
+                                <li>Google authentication</li>
+                                <li>Active sessions monitoring</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="settings-card data">
+                        <div class="settings-icon">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <div class="settings-content">
+                            <h4>Data Management</h4>
+                            <p>For data export requests, email us at <strong>spendserver@gmail.com</strong></p>
+                            <div class="warning-box">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span>Account deletion removes ALL data permanently</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQs -->
+            <div class="help-article" id="faq">
+                <div class="article-header">
+                    <h3><i class="fas fa-question-circle"></i> Frequently Asked Questions</h3>
+                </div>
+
+                <div class="article-content">
+                    <div class="faq-container">
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <h4>How do I track money I'm owed?</h4>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p>When adding a record, enter the due amount and mark as unpaid. These will appear in
+                                    your "Pending Dues" section. You can filter by person to see all dues from specific
+                                    individuals.</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <h4>Can I select specific records for an invoice?</h4>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p>Yes! After filtering your records, use the checkboxes to select exactly which
+                                    transactions should appear on the invoice. Uncheck any items you don't want to
+                                    include.</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <h4>What's the difference between spend and debited amount?</h4>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p>Spend amount is the total price of what you're paying for, while debited amount is
+                                    what actually comes out of your account (after discounts, cashback, or coupons).
+                                    This helps you track your actual spending versus potential savings.</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <h4>How do I delete my account?</h4>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p>Go to Settings > Security and click "Delete Account". This will permanently remove
+                                    all your records, personal information, and account details. This action cannot be
+                                    undone.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="help-sidebar mobview-sidebar">
+            <div class="contact-support mobview-support">
+                <span class="border">
+                    <h4>Need More Help?</h4>
+                    <p>Our support team is ready to assist you.</p>
+                       {% if isAdmin %}
+                        <a href="/Dashboard/Support/Ticket/Admin/{{id}}/" class="btn btn-outline" style="padding: 5%;">
+                            <i class="fas fa-headset"></i> View Tickets
+                        </a>
+                        {% else %}
+                        <a href="/Dashboard/Support/Ticket/{{id}}/" class="btn btn-outline" style="padding: 5%;">
+                            <i class="fas fa-headset"></i> Contact US
+                        </a>
+                        {% endif %}
+                </span>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // === FAQ Toggle ===
+        const faqItems = document.querySelectorAll('.faq-item');
+
+        if (!faqItems.length) {
+            console.warn("No .faq-item found");
+            return;
+        }
+
+        faqItems.forEach(item => {
+            const question = item.querySelector('.faq-question');
+            const answer = item.querySelector('.faq-answer');
+            const icon = question?.querySelector('i');
+
+            if (!question || !answer || !icon) {
+                console.warn("Missing question/answer/icon in FAQ item:", item);
+                return;
+            }
+
+            question.addEventListener('click', () => {
+                const isActive = item.classList.contains('active');
+
+                if (isActive) {
+                    // CLOSE: It's already open, so close it
+                    item.classList.remove('active');
+                    answer.style.maxHeight = null;
+                    icon.classList.remove('fa-chevron-up');
+                    icon.classList.add('fa-chevron-down');
+                } else {
+                    // CLOSE all others
+                    faqItems.forEach(otherItem => {
+                        otherItem.classList.remove('active');
+                        const otherAnswer = otherItem.querySelector('.faq-answer');
+                        const otherIcon = otherItem.querySelector('.faq-question i');
+                        if (otherAnswer) otherAnswer.style.maxHeight = null;
+                        if (otherIcon) {
+                            otherIcon.classList.remove('fa-chevron-up');
+                            otherIcon.classList.add('fa-chevron-down');
+                        }
+                    });
+
+                    // OPEN this one
+                    item.classList.add('active');
+                    setTimeout(() => {
+                        answer.style.maxHeight = answer.scrollHeight + 'px';
+                    }, 10);
+                    icon.classList.remove('fa-chevron-down');
+                    icon.classList.add('fa-chevron-up');
+                }
+            });
+        });
+
+        // === Tabs ===
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabId = btn.getAttribute('data-tab');
+                tabBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                tabContents.forEach(content => {
+                    content.classList.remove('active');
+                    if (content.id === tabId) {
+                        content.classList.add('active');
+                    }
+                });
+            });
+        });
+
+        // === Category Navigation ===
+        const helpCategoryLinks = document.querySelectorAll('.help-categories a');
+        const helpArticles = document.querySelectorAll('.help-article');
+
+        helpCategoryLinks.forEach(link => {
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+
+                helpCategoryLinks.forEach(l => l.parentElement.classList.remove('active'));
+                helpArticles.forEach(article => article.classList.remove('active'));
+
+                this.parentElement.classList.add('active');
+                const targetArticle = document.getElementById(targetId);
+                if (targetArticle) {
+                    targetArticle.classList.add('active');
+                    targetArticle.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // === Mobile Menu Toggle ===
+        const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+        const sidebar = document.querySelector('.sidebar');
+
+        const mobileMenuOverlay = document.querySelector('.mobile-menu-overlay') || (() => {
+            const overlay = document.createElement('div');
+            overlay.className = 'mobile-menu-overlay';
+            document.body.appendChild(overlay);
+            return overlay;
+        })();
+
+        if (mobileMenuToggle && sidebar) {
+            mobileMenuToggle.addEventListener('click', function () {
+                sidebar.classList.toggle('active');
+                mobileMenuOverlay.classList.toggle('active');
+            });
+        }
+
+        mobileMenuOverlay.addEventListener('click', function () {
+            sidebar?.classList.remove('active');
+            this.classList.remove('active');
+        });
+    });
+</script>
+
+{% endblock %}
+{% endblock %}

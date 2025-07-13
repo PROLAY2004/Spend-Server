@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Spend Server - OTP Verification</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'CSS/Auth/otp_verification.css' %}">
+    <link rel="icon" href="{% static 'Images/icon.png' %}" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+        integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body>
+    <div id="global-loader">
+        <div class="loader-spinner"></div>
+    </div>
+    {% if msg %}
+    <div class="custom-toast" id="myToast">
+        <div class="custom-toast-body">
+            {{ msg }}
+            <button class="close-btn" onclick="closeToast()">&times;</button>
+        </div>
+    </div>
+    {% endif %}
+    
+    <main class="box">
+        <div class="content">
+            <div class="logo-container">
+                <i class="fa-solid fa-code fa-lg"></i>
+                <h1>Spend Server</h1>
+            </div>
+            <div class="hero-text">
+                <h2>Secure Verification</h2>
+                <p>Enter the 6-digit OTP sent to your email to access your dashboard.</p>
+            </div>
+        </div>
+        <div class="login">
+            <div class="welcome-container">
+                <h3>OTP Verification</h3>
+                <p class="subtext">We've sent a verification code to your email address</p>
+            </div>
+
+            <form class="auth-form" id="otpForm" method="post">
+                {% csrf_token %}
+                <div class="otp-container">
+                    <div class="otp-inputs">
+                        <input type="text" id="otp1" class="otp-input" maxlength="1" data-index="1" inputmode="numeric"
+                            pattern="[0-9]*" required>
+                        <input type="text" class="otp-input" maxlength="1" data-index="2" inputmode="numeric"
+                            pattern="[0-9]*" required>
+                        <input type="text" class="otp-input" maxlength="1" data-index="3" inputmode="numeric"
+                            pattern="[0-9]*" required>
+                        <input type="text" class="otp-input" maxlength="1" data-index="4" inputmode="numeric"
+                            pattern="[0-9]*" required>
+                        <input type="text" class="otp-input" maxlength="1" data-index="5" inputmode="numeric"
+                            pattern="[0-9]*" required>
+                        <input type="text" class="otp-input" maxlength="1" data-index="6" inputmode="numeric"
+                            pattern="[0-9]*" required>
+                    </div>
+                    <input type="hidden" id="fullOtp" name="otp">
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-check-circle"></i> Verify & Continue
+                </button>
+
+                <div class="resend-container">
+                    <p>Use different email ? <a href="/Auth/Login/" id="resendOtp">Click Here</a></p>
+                    <!-- <p class="timer" id="timer">00:30</p> -->
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Toastify JS -->
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="{% static 'JS/Auth/otp_verification.js' %}"></script>
+</body>
+
+<script>
+    function closeToast() {
+        document.getElementById('myToast').style.display = 'none';
+    }
+
+    const toast = document.getElementById('myToast');
+    toast.style.display = 'block';
+
+    setTimeout(() => {
+        toast.style.display = 'none';
+    }, 3000);
+</script>
+<script>
+    // Hide loader after page fully loads or comes from bfcache
+    function hideLoader() {
+        const loader = document.getElementById("global-loader");
+        if (loader) loader.style.display = "none";
+    }
+
+    window.addEventListener("load", hideLoader);
+    window.addEventListener("pageshow", hideLoader); // Handles browser back/forward
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const forms = document.querySelectorAll("form");
+        forms.forEach(form => {
+            form.addEventListener("submit", () => {
+                const loader = document.getElementById("global-loader");
+                if (loader) loader.style.display = "flex";
+            });
+        });
+
+        // Optional: Show loader when navigating via links
+        const links = document.querySelectorAll("a[href]");
+        links.forEach(link => {
+            link.addEventListener("click", function (e) {
+                const target = link.getAttribute("target");
+                const href = link.getAttribute("href");
+                if (!target && href && !href.startsWith("#") && !href.startsWith("javascript:")) {
+                    const loader = document.getElementById("global-loader");
+                    if (loader) loader.style.display = "flex";
+                }
+            });
+        });
+    });
+</script>
+</html>

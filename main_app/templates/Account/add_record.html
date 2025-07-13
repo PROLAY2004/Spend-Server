@@ -1,0 +1,91 @@
+{% extends 'Account/base.html' %}
+
+{% block title %}Add Record - Spend Server{% endblock %}
+{% block page_title %}Add New Record{% endblock %}
+{% block breadcrumbs %}Home / Add Record{% endblock %}
+
+{% block content %}
+{% if msg %}
+<div class="custom-toast" id="myToast">
+    <div class="custom-toast-body">
+        {{ msg }}
+        <button class="close-btn" onclick="closeToast()">&times;</button>
+    </div>
+</div>
+{% endif %}
+<div class="form-container">
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="date">Date : </label>
+            <input type="date" id="date" name="date" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description : </label>
+            <input type="text" id="description" name="description" placeholder="Enter Reason of Spend"
+                class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label for="amt">Spent Amount : </label>
+            <input type="number" id="amt" name="spend" class="form-control" step="0.01" min="0"
+                placeholder="Original Price" required>
+        </div>
+
+        <div class="form-group">
+            <label for="amount">Orginal Debited Amount : </label>
+            <input type="number" id="amount" name="org" class="form-control" step="0.01" min="0"
+                placeholder="Discounted Price" required>
+        </div>
+
+        <div class="form-group">
+            <label for="dueFrom">Due From : </label>
+            <input type="text" id="dueFrom" name="dueFrom" placeholder="Name of the Person" class="form-control"
+                required>
+        </div>
+
+        <div class="form-group">
+            <label for="amnt">Due Amount : </label>
+            <input type="number" id="amnt" name="due" class="form-control" step="0.01" placeholder="Total Due Amount"
+                required>
+        </div>
+
+        <div class="form-group">
+            <label for="status">Payemnt Status : </label>
+            <select id="status" name="status" class="form-control" required>
+                <option value="">Select Status</option>
+                <option value="Paid">Paid</option>
+                <option value="Non-Paid">Non-Paid</option>
+            </select>
+        </div>
+
+
+
+        <div class="form-group">
+            <label for="notes">Notes (Optional)</label>
+            <textarea id="notes" name="notes" class="form-control" placeholder="Any Extra Details..."
+                rows="3"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> Save Record
+        </button>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function closeToast() {
+        document.getElementById('myToast').style.display = 'none';
+    }
+
+    const toast = document.getElementById('myToast');
+    toast.style.display = 'block';
+
+    setTimeout(() => {
+        toast.style.display = 'none';
+    }, 3000);
+</script>
+{% endblock %}
