@@ -1,0 +1,290 @@
+{% extends 'Account/base.html' %}
+
+{% block title %}Admin Ticket #{{ ticket.Ticket_id }} - Support{% endblock %}
+{% block page_title %}Ticket Conversation (Admin){% endblock %}
+{% block breadcrumbs %}Admin / Support / Ticket #{{ ticket.Ticket_id }}{% endblock %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'CSS/Account/admin_conversation.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="mobile-tab-switcher">
+    <button class="tab-btn active" data-tab="conversation">Conversation</button>
+    <button class="tab-btn" data-tab="user-info">User Info</button>
+</div>
+
+<div class="admin-conversation-container">
+    <div class="admin-panel mobile-hidden">
+        <!-- User Information Section -->
+        <div class="user-info-card">
+            <div class="user-header">
+                <h3>User Information</h3>
+                <span class="ticket-status status-{{ ticket.Status|lower }}">{{ ticket.Status }}</span>
+            </div>
+            
+            <div class="user-details">
+                <div class="detail-row">
+                    <span class="detail-label">Name : </span>
+                    <span class="detail-value">{{ userdetails.Name }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Email : </span>
+                    <span class="detail-value">{{ userdetails.Email }}</span>
+                </div>
+                {% if userdetails.Mobile %}
+                <div class="detail-row">
+                    <span class="detail-label">Mobile : </span>
+                    <span class="detail-value">{{ userdetails.Mobile }}</span>
+                </div>
+                {% endif %}
+                <div class="detail-row">
+                    <span class="detail-label">Joined : </span>
+                    <span class="detail-value">{{ userdetails.Creation_Time|date:"M d, Y h:i A" }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Last Login : </span>
+                    <span class="detail-value">{{ userdetails.Last_loging_Time|date:"M d, Y h:i A" }}</span>
+                </div>
+            </div>
+            
+            <div class="ticket-meta">
+                <div class="detail-row">
+                    <span class="detail-label">Ticket ID:</span>
+                    <span class="detail-value">#{{ ticket.Ticket_id }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Created:</span>
+                    <span class="detail-value">{{ ticket.Ticket_Creation_Time|date:"M d, Y h:i A" }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Subject:</span>
+                    <span class="detail-value">{{ ticket.Subject }}</span>
+                </div>
+            </div>
+            
+            {% if ticket.Status == 'Closed' %}
+            <form method="post" class="ticket-actions">
+                {% csrf_token %}
+                <input type="hidden" name="reopen" value="Yes">
+                <button type="submit" class="action-btn reopen-btn">
+                    <i class="fas fa-redo"></i> Reopen Ticket
+                </button>
+            </form>
+            {% else %}
+            <form method="post" class="ticket-actions">
+                {% csrf_token %}
+                <input type="hidden" name="close" value="Yes">
+                <button type="submit" class="action-btn close-btn">
+                    <i class="fas fa-lock"></i> Close Ticket
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="conversation-area mobile-active">
+        <div class="conversation-header">
+            <h3>Conversation</h3>
+            <div class="conversation-controls">
+                <button class="control-btn" id="refresh-conversation">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+        </div>
+        
+        <div class="messages-container" id="messages-container">
+            {% if ticket.Messages %}
+                {% for msg in ticket.Messages %}
+                    <div class="message message-{% if msg.Sender_id == id %}admin{% else %}user{% endif %}">
+                        <div class="message-header">
+                            <span class="message-sender">
+                                {% if msg.Sender_id == id %}
+                                    You (Support)
+                                {% else %}
+                                    {{ userdetails.Name }}
+                                {% endif %}
+                            </span>
+                            <span class="message-time">{{ msg.Timestamp|date:"M d, h:i A" }}</span>
+                        </div>
+                        <div class="message-content">
+                            {{ msg.Message|linebreaksbr }}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-messages">
+                    <i class="far fa-comment-dots"></i>
+                    <p>No messages in this ticket yet.</p>
+                </div>
+            {% endif %}
+        </div>
+        
+        {% if ticket.Status == 'Open' %}
+        <div class="reply-form-container">
+            <form method="post" enctype="multipart/form-data" class="reply-form" id="reply-form">
+                {% csrf_token %}
+                <div class="form-group">
+                    <textarea name="message" class="reply-input" placeholder="Type your reply as support team..." required id="message-input"></textarea>
+                    <div class="form-actions">
+                        <button type="submit" class="send-btn" id="send-btn">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        {% else %}
+        <div class="reply-form-container closed-notice">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                <p>This ticket is closed. Reopen it to send messages.</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-scroll to bottom of messages
+    const messagesContainer = document.getElementById('messages-container');
+    if (messagesContainer) {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        
+        // Mobile-specific scroll behavior
+        if (window.innerWidth <= 768) {
+            messagesContainer.style.maxHeight = 'calc(100vh - 180px)';
+            messagesContainer.style.overflowY = 'auto';
+            messagesContainer.style.webkitOverflowScrolling = 'touch';
+        }
+    }
+    
+    // Auto-resize textarea
+    const replyInput = document.getElementById('message-input');
+    if (replyInput) {
+        // Set initial height
+        replyInput.style.height = 'auto';
+        replyInput.style.height = (replyInput.scrollHeight) + 'px';
+        
+        replyInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+            
+            // Limit max height
+            if (this.scrollHeight > 150) {
+                this.style.overflowY = 'auto';
+            } else {
+                this.style.overflowY = 'hidden';
+            }
+        });
+    }
+    
+    // Send message on Enter key (but allow Shift+Enter for new line)
+    const replyForm = document.getElementById('reply-form');
+    if (replyForm) {
+        replyForm.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                document.getElementById('send-btn').click();
+            }
+        });
+    }
+    
+    // Refresh conversation button
+    const refreshBtn = document.getElementById('refresh-conversation');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', function() {
+            window.location.reload();
+        });
+    }
+    
+    // Keep scroll at bottom when new messages arrive
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.addedNodes.length) {
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+        });
+    });
+    
+    if (messagesContainer) {
+        observer.observe(messagesContainer, {
+            childList: true,
+            subtree: true
+        });
+    }
+    
+    // Focus message input on load
+    if (replyInput) {
+        replyInput.focus();
+    }
+
+    // Mobile viewport height adjustment
+    function setViewportHeight() {
+        if (window.innerWidth <= 768) {
+            let vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+            
+            const conversationArea = document.querySelector('.conversation-area');
+            if (conversationArea && conversationArea.classList.contains('mobile-active')) {
+                conversationArea.style.height = 'calc(var(--vh, 1vh) * 100)';
+            }
+        }
+    }
+
+    setViewportHeight();
+    window.addEventListener('resize', setViewportHeight);
+});
+
+// Mobile tab switching
+document.addEventListener('DOMContentLoaded', function () {
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const adminPanel = document.querySelector('.admin-panel');
+    const conversationArea = document.querySelector('.conversation-area');
+
+    function switchTab(tab) {
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+
+        if (tab === 'user-info') {
+            adminPanel.classList.remove('mobile-hidden');
+            adminPanel.classList.add('mobile-active');
+            conversationArea.classList.remove('mobile-active');
+            conversationArea.classList.add('mobile-hidden');
+            
+            // Scroll to top of user info panel
+            adminPanel.scrollTo(0, 0);
+        } else {
+            adminPanel.classList.remove('mobile-active');
+            adminPanel.classList.add('mobile-hidden');
+            conversationArea.classList.remove('mobile-hidden');
+            conversationArea.classList.add('mobile-active');
+            
+            // Scroll to bottom of messages
+            const messagesContainer = document.getElementById('messages-container');
+            if (messagesContainer) {
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+        }
+    }
+
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            switchTab(button.getAttribute('data-tab'));
+        });
+    });
+
+    // Handle back button on mobile
+    window.addEventListener('popstate', function() {
+        if (window.innerWidth <= 768) {
+            switchTab('conversation');
+        }
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}

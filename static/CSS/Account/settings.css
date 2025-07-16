@@ -1,0 +1,237 @@
+/* Additional CSS for Settings Page */
+.settings-container {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.privacy-content {
+    background-color: #1e2025;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.privacy-list {
+    list-style: none;
+    margin: 15px 0;
+}
+
+.privacy-list li {
+    padding: 8px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.privacy-list li i {
+    color: rgb(113, 85, 249);
+    margin-top: 3px;
+}
+
+.subscription-notice {
+    background-color: rgba(113, 85, 249, 0.1);
+    padding: 15px;
+    border-radius: 6px;
+    margin-top: 20px;
+    border-left: 3px solid rgb(113, 85, 249);
+}
+
+.subscription-notice h4 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.subscription-notice h4 i {
+    color: #ffc107;
+}
+
+.security-sessions {
+    margin-bottom: 30px;
+}
+
+.session-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background-color: #1e2025;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.session-item.current {
+    border-left: 3px solid rgb(113, 85, 249);
+}
+
+.session-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.session-info i {
+    font-size: 20px;
+    color: rgba(113, 85, 249, 0.7);
+}
+
+.session-info div small {
+    display: block;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 3px;
+}
+
+.session-actions {
+    margin-top: 20px;
+    text-align: right;
+}
+
+.account-deletion {
+    background-color: rgba(231, 76, 60, 0.1);
+    padding: 20px;
+    border-radius: 6px;
+    border-left: 3px solid #e74c3c;
+}
+
+.warning-text {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #e74c3c;
+    margin-bottom: 15px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+
+/* Settings Navigation Styles */
+.settings-nav {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 10px;
+}
+
+.settings-nav-btn {
+    padding: 10px 20px;
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.settings-nav-btn:hover {
+    color: #fff;
+    background: rgba(113, 85, 249, 0.1);
+}
+
+.settings-nav-btn.active {
+    color: #fff;
+    background: rgba(113, 85, 249, 0.2);
+}
+
+.settings-nav-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -11px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: rgb(113, 85, 249);
+}
+
+.settings-content {
+    background: #1e2025;
+    border-radius: 8px;
+    padding: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.settings-tab {
+    display: none;
+}
+
+.settings-tab.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+p#security {
+    margin-bottom: 3%;
+    color: #888;
+}
+
+@media(max-width : 678px) {
+    p#security {
+        margin-bottom: 10% !important;
+    }
+}
+
+.note-dialog-content.large {
+    max-width: 700px;
+    max-height: 500px;
+    overflow: hidden;
+}
+
+
+.hide-scroll {
+    max-height: 230px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+
+    /* Hide scrollbars */
+    scrollbar-width: none;          /* Firefox */
+    -ms-overflow-style: none;       /* IE/Edge */
+}
+
+.hide-scroll::-webkit-scrollbar {
+    display: none;                  /* Chrome, Safari */
+}
+
+.hide-scroll {
+    scroll-behavior: smooth;
+}
+
+a.btn-danger{
+    padding: 0.7rem 1.8rem;
+}
+.btn-danger {
+    background-color: #e3342f;
+    color: #ffffff;
+    border: none;
+}
+
+.btn-danger:hover {
+    background-color: #cc1f1a;
+    transform: translateY(-2px);
+}

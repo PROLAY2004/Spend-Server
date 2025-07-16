@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spend Server - Account Deletion Confirmation</title>
+    {% load static %}
+    <link rel="icon" href="{% static 'Images/icon.png' %}" type="image/x-icon">
+    <style type="text/css">
+        /* Same CSS as original template */
+        /* Base Styles */
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #0f0f13;
+            color: #e0e0e0;
+        }
+        
+        /* Email Container */
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #121218;
+            background-image: radial-gradient(circle at 25% 25%, rgba(113, 85, 249, 0.1) 0%, transparent 50%);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        /* Header */
+        .header {
+            padding: 30px;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(113, 85, 249, 0.2) 0%, rgba(113, 85, 249, 0) 100%);
+            border-bottom: 1px solid rgba(113, 85, 249, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header:before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(113, 85, 249, 0.05) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+            z-index: 0;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+            position: relative;
+            z-index: 1;
+            display: inline-block;
+        }
+        
+        .logo span {
+            color: rgb(113, 85, 249);
+        }
+        
+        .tagline {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 8px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Content */
+        .content {
+            padding: 30px;
+            line-height: 1.6;
+            position: relative;
+        }
+        
+        .content:after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(113, 85, 249, 0.3), transparent);
+        }
+        
+        h1 {
+            color: white;
+            font-size: 24px;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        p {
+            margin-bottom: 20px;
+            font-size: 16px;
+            color: rgba(224, 224, 224, 0.8);
+        }
+        
+        .highlight {
+            background: rgba(113, 85, 249, 0.15);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: rgb(113, 85, 249);
+            font-weight: 500;
+        }
+        
+        /* Warning Box */
+        .warning-box {
+            background: rgba(255, 87, 87, 0.1);
+            border-left: 3px solid #ff5757;
+            padding: 15px;
+            margin: 25px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .warning-box ul {
+            margin: 10px 0 0 0;
+            padding-left: 20px;
+        }
+        
+        .warning-box li {
+            margin-bottom: 8px;
+        }
+        
+        /* Button */
+        .button-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .button {
+            display: inline-block;
+            padding: 14px 28px;
+            background: rgb(113, 85, 249);
+            color: white !important;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(113, 85, 249, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .button:hover {
+            background: rgba(113, 85, 249, 0.9);
+            box-shadow: 0 6px 20px rgba(113, 85, 249, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .button:before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255, 255, 255, 0) 45%,
+                rgba(255, 255, 255, 0.1) 50%,
+                rgba(255, 255, 255, 0) 55%
+            );
+            transform: rotate(30deg);
+            animation: shine 3s infinite;
+        }
+        
+        /* Cancel Button */
+        .cancel-button {
+            background: rgba(255, 87, 87, 0.9) !important;
+            box-shadow: 0 4px 15px rgba(255, 87, 87, 0.3);
+        }
+        
+        .cancel-button:hover {
+            background: rgba(255, 87, 87, 0.8) !important;
+            box-shadow: 0 6px 20px rgba(255, 87, 87, 0.4);
+        }
+        
+        /* Footer */
+        .footer {
+            padding: 20px 30px;
+            text-align: center;
+            font-size: 13px;
+            color: rgba(224, 224, 224, 0.5);
+            background: rgba(15, 15, 19, 0.5);
+        }
+        
+        .social-links {
+            margin: 15px 0;
+        }
+        
+        .social-link {
+            display: inline-block;
+            margin: 0 8px;
+            color: rgba(224, 224, 224, 0.7) !important;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .social-link:hover {
+            color: rgb(113, 85, 249) !important;
+        }
+        
+        .contact {
+            margin-top: 15px;
+            font-size: 12px;
+        }
+        
+        /* Animations */
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(30deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(30deg); }
+        }
+        
+        /* Responsive */
+        @media screen and (max-width: 480px) {
+            .email-container {
+                border-radius: 0;
+            }
+            
+            .header, .content {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <a href="#" class="logo">Spend<span>Server</span></a>
+            <div class="tagline">Account Deletion Confirmation</div>
+        </div>
+        
+        <div class="content">
+            <h1>Your Account Has Been Deleted</h1>
+            
+            <p>Hello,</p>
+            
+            <p>We're confirming that your <span class="highlight">Spend Server</span> account and all associated data have been permanently deleted as per your request.</p>
+            
+            <div class="warning-box">
+                <strong>Please note this action has:</strong>
+                <ul>
+                    <li>Permanently deleted all your personal data and account information</li>
+                    <li>Cancelled any active subscriptions</li>
+                    <li>Removed access to all Spend Server services</li>
+                    <li>Deleted all your transaction history and saved information</li>
+                </ul>
+            </div>
+            
+            <p>If you have any questions, feedback, or need further assistance, feel free to reach out to us at our support email: <a href="mailto:spendserver@gmail.com" style="color: rgb(113, 85, 249);">spendserver@gmail.com</a>. We're always here to help and ensure you have the best experience with Spend Server. </p>
+            
+            <div class="button-container">
+                <a href="{{domain}}" class="button">Visit Spend Server</a>
+            </div>
+            
+            <p>We're sorry to see you go. If you change your mind, you can create a new account anytime.</p>
+            
+            <p>Best regards,<br>The Spend Server Team</p>
+        </div>
+        
+        <div class="footer">
+            <div class="contact">
+                Email: <a href="mailto:spendserver@gmail.com" style="color: rgba(224, 224, 224, 0.7) !important;">spendserver@gmail.com</a>
+            </div>
+            
+            <div style="margin-top: 20px; font-size: 11px; color: rgba(224, 224, 224, 0.3);">
+                &copy; 2025 Spend Server. All rights reserved.<br>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

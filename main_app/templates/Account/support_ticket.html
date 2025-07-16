@@ -1,0 +1,155 @@
+{% extends 'Account/base.html' %}
+
+{% block title %}Customer Support - Spend Server{% endblock %}
+{% block page_title %}Customer Support{% endblock %}
+{% block breadcrumbs %}Home / Support{% endblock %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'CSS/Account/help.css' %}">
+
+{% endblock %}
+
+{% block content %}
+<div class="support-container">
+    <div class="help-sections">
+        <div class="help-sidebar">
+            <h3>Support</h3>
+            <div class="gr">
+                <div class="help-categories">
+                    <ul>
+                        <li class="active"><a href="#new-ticket">Create New Ticket</a></li>
+                        <li><a href="#my-tickets">My Tickets</a></li>
+                    </ul>
+                </div>
+
+                <div class="contact-support ticketview">
+                    <span class="border">
+                        <h4>Need Immediate Help?</h4>
+                        <p>Contact us directly for urgent issues.</p>
+                        <a class="btn btn-outline" style="padding: 3%;">
+                            <i class="fas fa-envelope"></i> spendserver@gmail.com
+                        </a>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="help-content">
+            <!-- New Ticket Form -->
+            <div class="support-content active" id="new-ticket">
+                <div class="article-header">
+                    <h3><i class="fas fa-plus-circle"></i> Create New Support Ticket</h3>
+                    <p style="color: #666;">Fill out the form below to submit a new support request. Our team will
+                        respond as soon as possible.</p>
+                </div>
+
+                <form class="ticket-form" id="support-form" method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="ticket-subject">Subject</label>
+                        <input type="text" id="ticket-subject" class="form-control"
+                            placeholder="Briefly describe your issue" name="subject" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ticket-description">Description</label>
+                        <textarea id="ticket-description" name="details" class="form-control" rows="6"
+                            placeholder="Please provide detailed information about your issue..." required></textarea>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 30px;">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i> Submit Ticket
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- My Tickets -->
+            <div class="support-content" id="my-tickets">
+                <div class="article-header">
+                    <h3><i class="fas fa-ticket-alt"></i> My Support Tickets</h3>
+                    <p style="color: #666;">View your previous support requests and responses from our team.</p>
+                </div>
+
+                <div class="ticket-list">
+                    {% for ticket in tickets %}
+                    <div class="ticket-item">
+                        <div class="ticket-header">
+                            <h4 class="ticket-title">{{ticket.Subject}}</h4>
+                            {% if ticket.Status == 'Open' %}
+                            <span class="ticket-status status-open">Open</span>
+                            {% else %}
+                            <span class="ticket-status status-closed">Closed</span>
+                            {% endif %}
+                        </div>
+                        <div class="ticket-meta">
+                            <span>#{{ticket.Ticket_id}}</span>
+                            <span><i class="far fa-calendar"></i> {{ ticket.Ticket_Creation_Time}}</span>
+                        </div>
+
+                        <a class="btn btn-outline view-details-btn"
+                            href="/Dashboard/Support/Ticket/{{ticket.tid}}/{{id}}/"
+                            style="margin-top: 10px; width: 100%;">
+                            <i class="fas fa-comments"></i> View Conversation
+                        </a>
+                    </div>
+                    {% empty %}
+                    <p class="no-tickets-msg">You have no support tickets at the moment.</p>
+                    {% endfor %}
+
+                </div>
+            </div>
+
+            <!-- FAQs -->
+
+        </div>
+
+        <div class="help-sidebar mobview-sidebar">
+            <div class="contact-support mobview-support">
+                <span class="border">
+                    <h4>Need Immediate Help?</h4>
+                    <p>Contact us directly for urgent issues.</p>
+                    <a class="btn btn-outline" style="padding: 1%;">
+                        <i class="fas fa-envelope"></i> spendserver@gmail.com
+                    </a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // === Support Tab Navigation ===
+        const supportTabs = document.querySelectorAll('.support-tab');
+        const supportContents = document.querySelectorAll('.support-content');
+        const helpCategoryLinks = document.querySelectorAll('.help-categories a');
+
+        // Initialize first tab as active
+        if (supportTabs.length > 0 && supportContents.length > 0) {
+            supportContents[0].classList.add('active');
+        }
+
+        // Handle category link clicks
+        helpCategoryLinks.forEach(link => {
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+
+                helpCategoryLinks.forEach(l => l.parentElement.classList.remove('active'));
+                supportContents.forEach(content => content.classList.remove('active'));
+
+                this.parentElement.classList.add('active');
+                const targetContent = document.getElementById(targetId);
+                if (targetContent) {
+                    targetContent.classList.add('active');
+                    targetContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

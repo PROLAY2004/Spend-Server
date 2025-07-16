@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Spend Server - Record Your Daily Expences</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'CSS/home.css' %}">
+    <link rel="icon" href="{% static 'Images/icon.png' %}" type="image/x-icon">
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+        integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+</head>
+
+<body>
+    <div id="global-loader">
+        <div class="loader-spinner"></div>
+    </div>
+    <nav>
+        <a href="#" class="logo">Spend Server</a>
+        <div class="nav-links">
+            <a href="#home" class="nav-link active">Home</a>
+            <a href="#about" class="nav-link">About</a>
+            <a href="#contact" class="nav-link">Contact</a>
+        </div>
+        <div class="auth-buttons">
+            {% if not isLogin %}
+                <a class="signup" href="/Auth/Login/" style="margin-left: 70px;">Sign In</a>
+            {% else %}
+                <a class="signup" href="/Auth/Logout/" style="margin-left: 70px; background-color: rgb(190, 115, 91);">Logout</a>
+            {% endif %}
+        </div>
+        <div class="auth-buttons mob">
+            {% if not isLogin %}
+            <a class="signup" href="/Auth/Login/">Sign In</a>
+            {% else %}
+            <a class="signup" href="/Auth/Logout/" style="background-color: rgb(190, 115, 91);">Logout</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <main>
+        <section id="home" class="hero">
+            <div class="hero-content">
+                <h1>Record Your<br>Daily Expences</h1>
+                <p>Effortlessly record your daily expenses, manage lend/borrow entries, and generate invoices — all in
+                    one place with Spend Server.</p>
+                <div class="cta-group">
+                    {% if not isLogin %}
+                    <a class="cta-button" href="/Auth/Login/">Get Started For Free</a>
+                    {% else %}
+                    <a class="cta-button" href="/Dashboard/Home/{{id}}/">Go to Dashboard</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="hero-graphics">
+                <div class="gradient-orb"></div>
+                <div class="floating-cards">
+                    <div class="card card-1"></div> 
+                    <div class="card card-2"></div>
+                    <div class="card card-3"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="section">
+            <div class="section-content">
+                <h2>About Spend Server</h2>
+                <p>Spend Server is your personal finance companion designed to simplify expense tracking and money
+                    management. Our mission is to help you gain control over your finances with intuitive tools and
+                    insightful analytics.</p>
+                <div class="features">
+                    <div class="feature">
+                        <h3>Easy Expense Tracking</h3>
+                        <p>Quickly record your daily expenses with just a few taps and categorize them for better
+                            organization.</p>
+                    </div>
+                    <div class="feature">
+                        <h3>Lend & Borrow Management</h3>
+                        <p>Keep track of money you've lent or borrowed with automated reminders and payment tracking.
+                        </p>
+                    </div>
+                    <div class="feature">
+                        <h3>Invoice Generation</h3>
+                        <p>Create professional invoices for your freelance work or small business directly from the app.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="section">
+            <div class="section-content">
+                <h2>Contact Us</h2>
+                <p>Have questions or feedback? We'd love to hear from you!</p>
+                <form class="contact-form" method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <input type="text" name="Name" placeholder="Your Name" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" name="Email" placeholder="Your Email" required>
+                    </div>
+                    <div class="form-group">
+                        <textarea placeholder="Your Message" name="Msg" rows="5" required></textarea>
+                    </div>
+                    <button type="submit" class="cta-button">Send Message</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">
+                <a href="#" class="logo">Spend Server</a>
+                <p>Spend Server is your all-in-one personal finance companion that helps you effortlessly record daily
+                    expenses, manage money lent or borrowed, and keep all your financial transactions organized in one
+                    secure and easy-to-access place—empowering you to take full control of your finances with clarity
+                    and confidence.</p>
+            </div>
+            <div class="footer-links">
+                <div class="link-group">
+                    <h4>Social</h4>
+                    <a href="#about">About</a>
+                    <a><i class="fas fa-envelope"></i> SpendServer@gmail.com</a>
+                    <div class="social-links">
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="link-group">
+                    <h4>Legal</h4>
+                    <a href="#">Privacy</a>
+                    <a href="#">Terms</a>
+                    <a href="#">Cookies</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Spend Server. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="{% static 'JS/home.js' %}"></script>
+</body>>
+<script>
+    // Show loader function
+    function showLoader() {
+        const loader = document.getElementById("global-loader");
+        if (loader) loader.classList.add("active");
+    }
+
+    // Hide loader function
+    function hideLoader() {
+        const loader = document.getElementById("global-loader");
+        if (loader) loader.classList.remove("active");
+    }
+
+    // Hide loader when page finishes loading (normal load or back-forward cache)
+    window.addEventListener("load", hideLoader);
+    window.addEventListener("pageshow", hideLoader); // For back-forward navigation
+
+    window.addEventListener("DOMContentLoaded", function () {
+        // Show loader on form submission
+        document.querySelectorAll("form").forEach(form => {
+            form.addEventListener("submit", () => {
+                showLoader();
+            });
+        });
+
+        // Show loader on normal <a> link clicks (excluding in-page anchors and JS links)
+        document.querySelectorAll('a[href]').forEach(link => {
+            const href = link.getAttribute("href");
+            if (
+                !href.startsWith("#") &&
+                !href.startsWith("javascript:") &&
+                !link.getAttribute("target")
+            ) {
+                link.addEventListener("click", function () {
+                    showLoader();
+                });
+            }
+        });
+    });
+</script>
+
+</html>

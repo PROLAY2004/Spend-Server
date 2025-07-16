@@ -1,0 +1,156 @@
+{% extends 'Account/base.html' %}
+
+{% block title %}Ticket Conversation - Spend Server{% endblock %}
+{% block page_title %}Ticket Conversation{% endblock %}
+{% block breadcrumbs %}Home / Support / Ticket #{{ ticket.Ticket_id }}{% endblock %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'CSS/Account/conversation.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="conversation-container">
+    <div class="ticket-header">
+        <div class="ticket-meta">
+            <div>
+                <span class="ticket-id">Ticket #{{ ticket.Ticket_id }}</span>
+                <span class="ticket-date">{{ ticket.Ticket_Creation_Time|date:"M d, Y h:i A" }}</span>
+            </div>
+            <span class="ticket-status status-{{ ticket.Status|lower }}">{{ ticket.Status }}</span>
+        </div>
+        <h3 class="ticket-subject">{{ ticket.Subject }}</h3>
+        
+        {% if ticket.Status == 'Closed' %}
+            <form method="post">
+                {% csrf_token %}
+                <input type="text" value="Yes" style="display: none;" name="reopen">
+                <button type="submit" class="reopen-btn">
+                    <i class="fas fa-redo"></i> Reopen Ticket
+                </button>
+            </form>
+        {% endif %}
+    </div>
+    
+    <div class="conversation-body">
+        <div class="messages-container" id="messages-container">
+            {% if ticket.Messages %}
+                {% for msg in ticket.Messages %}
+                    <div class="message message-{% if msg.Sender_id == id %}user{% else %}support{% endif %}">
+                        <div class="message-header">
+                            <span class="message-sender">
+                                {% if msg.Sender_id == id %}
+                                    You
+                                {% else %}
+                                    Support Team
+                                {% endif %}
+                            </span>
+                            <span class="message-time">{{ msg.Timestamp|date:"M d, h:i A" }}</span>
+                        </div>
+                        <div class="message-content">
+                            {{ msg.Message|linebreaksbr }}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-messages">
+                    <i class="far fa-comment-dots"></i>
+                    <p>No messages yet. Start the conversation!</p>
+                </div>
+            {% endif %}
+        </div>
+        
+        {% if ticket.Status == 'Open' %}
+        <div class="reply-form-container">
+            <form method="post" enctype="multipart/form-data" class="reply-form" id="reply-form">
+                {% csrf_token %}
+                <textarea name="message" class="reply-input" placeholder="Type your reply..." required id="message-input"></textarea>
+                <button type="submit" class="send-btn" id="send-btn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </form>
+        </div>
+        {% else %}
+        <div class="reply-form-container" style="text-align: center;">
+            <p style="color: rgba(255, 255, 255, 0.5); font-size: 14px;">
+                This ticket is closed. You can reopen it to continue the conversation.
+            </p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-scroll to bottom of messages
+    const messagesContainer = document.getElementById('messages-container');
+    if (messagesContainer) {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+    
+    // Auto-resize textarea
+    const replyInput = document.getElementById('message-input');
+    if (replyInput) {
+        // Set initial height
+        replyInput.style.height = 'auto';
+        replyInput.style.height = (replyInput.scrollHeight) + 'px';
+        
+        replyInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+            
+            // Limit max height
+            if (this.scrollHeight > 120) {
+                this.style.overflowY = 'auto';
+            } else {
+                this.style.overflowY = 'hidden';
+            }
+        });
+    }
+    
+    // Send message on Enter key (but allow Shift+Enter for new line)
+    const replyForm = document.getElementById('reply-form');
+    if (replyForm) {
+        replyForm.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                document.getElementById('send-btn').click();
+            }
+        });
+        
+        // Handle form submission
+        replyForm.addEventListener('submit', function(e) {
+            const sendBtn = document.getElementById('send-btn');
+            if (sendBtn) {
+                sendBtn.disabled = true;
+                sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            }
+            // Form will submit normally, page will refresh
+        });
+    }
+    
+    // Keep scroll at bottom when new messages arrive
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.addedNodes.length) {
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+        });
+    });
+    
+    if (messagesContainer) {
+        observer.observe(messagesContainer, {
+            childList: true,
+            subtree: true
+        });
+    }
+    
+    // Focus message input on load
+    if (replyInput) {
+        replyInput.focus();
+    }
+});
+</script>
+{% endblock %}
+{% endblock %}

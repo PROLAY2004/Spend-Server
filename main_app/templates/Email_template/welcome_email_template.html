@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spend Server - Welcome Aboard!</title>
+    {% load static %}
+    <link rel="icon" href="{% static 'Images/icon.png' %}" type="image/x-icon">
+    <style type="text/css">
+        /* Same CSS as original template */
+        /* Base Styles */
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #0f0f13;
+            color: #e0e0e0;
+        }
+
+        /* Email Container */
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #121218;
+            background-image: radial-gradient(circle at 25% 25%, rgba(113, 85, 249, 0.1) 0%, transparent 50%);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Header */
+        .header {
+            padding: 30px;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(113, 85, 249, 0.2) 0%, rgba(113, 85, 249, 0) 100%);
+            border-bottom: 1px solid rgba(113, 85, 249, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header:before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(113, 85, 249, 0.05) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+            z-index: 0;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+            position: relative;
+            z-index: 1;
+            display: inline-block;
+        }
+
+        .logo span {
+            color: rgb(113, 85, 249);
+        }
+
+        .tagline {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Content */
+        .content {
+            padding: 30px;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        .content:after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(113, 85, 249, 0.3), transparent);
+        }
+
+        h1 {
+            color: white;
+            font-size: 24px;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        p {
+            margin-bottom: 20px;
+            font-size: 16px;
+            color: rgba(224, 224, 224, 0.8);
+        }
+
+        .highlight {
+            background: rgba(113, 85, 249, 0.15);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: rgb(113, 85, 249);
+            font-weight: 500;
+        }
+
+        /* Features List */
+        .features {
+            margin: 25px 0;
+        }
+
+        .feature {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .feature-icon {
+            margin-right: 15px;
+            color: rgb(113, 85, 249);
+            font-size: 20px;
+        }
+
+        .feature-text {
+            flex: 1;
+        }
+
+        .feature-title {
+            font-weight: 600;
+            color: white;
+            margin-bottom: 5px;
+        }
+
+        /* Button */
+        .button-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 14px 28px;
+            background: rgb(113, 85, 249);
+            color: white !important;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(113, 85, 249, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .button:hover {
+            background: rgba(113, 85, 249, 0.9);
+            box-shadow: 0 6px 20px rgba(113, 85, 249, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .button:before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(to bottom right,
+                    rgba(255, 255, 255, 0) 45%,
+                    rgba(255, 255, 255, 0.1) 50%,
+                    rgba(255, 255, 255, 0) 55%);
+            transform: rotate(30deg);
+            animation: shine 3s infinite;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 20px 30px;
+            text-align: center;
+            font-size: 13px;
+            color: rgba(224, 224, 224, 0.5);
+            background: rgba(15, 15, 19, 0.5);
+        }
+
+        .social-links {
+            margin: 15px 0;
+        }
+
+        .social-link {
+            display: inline-block;
+            margin: 0 8px;
+            color: rgba(224, 224, 224, 0.7) !important;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .social-link:hover {
+            color: rgb(113, 85, 249) !important;
+        }
+
+        .contact {
+            margin-top: 15px;
+            font-size: 12px;
+        }
+
+        /* Animations */
+        @keyframes rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes shine {
+            0% {
+                transform: translateX(-100%) translateY(-100%) rotate(30deg);
+            }
+
+            100% {
+                transform: translateX(100%) translateY(100%) rotate(30deg);
+            }
+        }
+
+        /* Responsive */
+        @media screen and (max-width: 480px) {
+            .email-container {
+                border-radius: 0;
+            }
+
+            .header,
+            .content {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="email-container">
+        <div class="header">
+            <a href="#" class="logo">Spend<span>Server</span></a>
+            <div class="tagline">Welcome to Your Financial Freedom</div>
+        </div>
+
+        <div class="content">
+            <h1>Welcome to Spend Server!</h1>
+
+            <p>Hello there,</p>
+
+            <p>We're thrilled to welcome you to <span class="highlight">Spend Server</span>! Your account is now active
+                and ready to help you take control of your finances.</p>
+
+            <div class="features">
+                <div class="feature">
+                    <div class="feature-icon">✓</div>
+                    <div class="feature-text">
+                        <div class="feature-title">Track Your Spending</div>
+                        <div>Get real-time insights into where your money goes with our intuitive dashboard.</div>
+                    </div>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">✓</div>
+                    <div class="feature-text">
+                        <div class="feature-title">Lend & Borrow Management</div>
+                        <div>Keep track of money you've lent or borrowed with automated reminders and payment tracking.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">✓</div>
+                    <div class="feature-text">
+                        <div class="feature-title">Invoice Generation</div>
+                        <div>Create professional invoices for your freelance work or small business directly from the
+                            app.</div>
+                    </div>
+                </div>
+            </div>
+
+            <p>To get started, log in to your account and connect your first financial institution. We'll take care of
+                the rest!</p>
+
+            <div class="button-container">
+                <a href="{{domain}}" class="button">Start Using Spend Server</a>
+            </div>
+
+            <p>If you have any questions or need help getting started, don't hesitate to reach out to our support team
+                at <a href="mailto:spendserver@gmail.com" style="color: rgb(113, 85, 249);">spendserver@gmail.com</a>.
+            </p>
+
+            <p>Happy budgeting!<br>The Spend Server Team</p>
+        </div>
+
+        <div class="footer">
+
+            <div class="contact">
+                Email: <a href="mailto:spendserver@gmail.com"
+                    style="color: rgba(224, 224, 224, 0.7) !important;">spendserver@gmail.com</a>
+            </div>
+
+            <div style="margin-top: 20px; font-size: 11px; color: rgba(224, 224, 224, 0.3);">
+                &copy; 2025 Spend Server. All rights reserved.<br>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

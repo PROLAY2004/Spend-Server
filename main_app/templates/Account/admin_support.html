@@ -1,0 +1,353 @@
+{% extends 'Account/base.html' %}
+
+{% block title %}Admin Support - Spend Server{% endblock %}
+{% block page_title %}Admin Support Tickets{% endblock %}
+{% block breadcrumbs %}Admin / Support Tickets{% endblock %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'CSS/Account/admin_support.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-support-container">
+    <div class="admin-toolbar">
+        <div class="search-container">
+            <i class="fas fa-search"></i>
+            <input type="text" id="ticket-search" placeholder="Search by Ticket ID..." autocomplete="off">
+        </div>
+        
+        <div class="filter-container">
+            <button class="filter-btn" id="status-filter-btn">
+                <i class="fas fa-filter"></i> Filter by Status
+            </button>
+            <button class="filter-btn" id="date-filter-btn">
+                <i class="fas fa-calendar-alt"></i> Filter by Date
+            </button>
+            
+            <div class="filter-dropdown" id="status-dropdown">
+                <select id="status-select">
+                    <option value="all">All Statuses</option>
+                    <option value="open">Open</option>
+                    <option value="closed">Closed</option>
+                </select>
+            </div>
+            
+            <div class="filter-dropdown" id="date-dropdown">
+                <div class="date-input-group">
+                    <label for="from-date">From:</label>
+                    <input type="date" id="from-date">
+                </div>
+                <div class="date-input-group">
+                    <label for="to-date">To:</label>
+                    <input type="date" id="to-date">
+                </div>
+                <button class="apply-date-btn">Apply</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="admin-tickets-grid">
+        <div class="tickets-header">
+            <div class="header-item">Ticket ID</div>
+            <div class="header-item">Subject</div>
+            <div class="header-item">User</div>
+            <div class="header-item">Created</div>
+            <div class="header-item">Status</div>
+            <div class="header-item">Action</div>
+        </div>
+        
+        <div class="tickets-list" id="tickets-list">
+            {% for ticket in tickets reversed %}
+            <div class="ticket-row" data-id="{{ ticket.Ticket_id }}" data-status="{{ ticket.Status|lower }}" data-date="{{ ticket.Ticket_Creation_Time|date:'Y-m-d' }}">
+                <div class="ticket-cell ticket-id">#{{ ticket.Ticket_id }}</div>
+                <div class="ticket-cell ticket-subject">{{ ticket.Subject }}</div>
+                <div class="ticket-cell ticket-user">{{ ticket.username }}</div>
+                <div class="ticket-cell ticket-date">{{ ticket.Ticket_Creation_Time|date:"M d, Y" }}</div>
+                <div class="ticket-cell ticket-status">
+                    <span class="status-badge status-{{ ticket.Status|lower }}">{{ ticket.Status }}</span>
+                </div>
+                <div class="ticket-cell ticket-action">
+                    <a href="/Dashboard/Support/Ticket/Admin/{{ticket.tid}}/{{id}}/" class="view-ticket-btn">
+                        <i class="fas fa-eye"></i> View
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="no-tickets">
+                <i class="fas fa-ticket-alt"></i>
+                <p>No support tickets found</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="pagination-container">
+        <div class="pagination-info" id="pagination-info">Showing <span id="start-index">1</span>-<span id="end-index">10</span> of <span id="total-tickets">{{ tickets|length }}</span> tickets</div>
+        <div class="pagination-controls">
+            <button class="pagination-btn" id="prev-page" disabled>
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="page-numbers" id="page-numbers"></div>
+            <button class="pagination-btn" id="next-page">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Constants and variables
+    const ticketsPerPage = 10;
+    const ticketRows = document.querySelectorAll('.ticket-row');
+    const totalTickets = ticketRows.length;
+    const totalPages = Math.ceil(totalTickets / ticketsPerPage);
+    let currentPage = 1;
+    
+    // DOM elements
+    const prevPageBtn = document.getElementById('prev-page');
+    const nextPageBtn = document.getElementById('next-page');
+    const pageNumbersContainer = document.getElementById('page-numbers');
+    const startIndexSpan = document.getElementById('start-index');
+    const endIndexSpan = document.getElementById('end-index');
+    const totalTicketsSpan = document.getElementById('total-tickets');
+    const paginationInfo = document.getElementById('pagination-info');
+    
+    // Initialize pagination
+    function initializePagination() {
+        // Clear existing page numbers
+        pageNumbersContainer.innerHTML = '';
+        
+        // Calculate range of pages to show (max 5 pages at a time)
+        let startPage = Math.max(1, currentPage - 2);
+        let endPage = Math.min(totalPages, startPage + 4);
+        
+        // Adjust if we're at the end
+        if (endPage - startPage < 4 && startPage > 1) {
+            startPage = Math.max(1, endPage - 4);
+        }
+        
+        // Add page number buttons
+        for (let i = startPage; i <= endPage; i++) {
+            const pageBtn = document.createElement('button');
+            pageBtn.className = 'pagination-btn';
+            if (i === currentPage) pageBtn.classList.add('active');
+            pageBtn.textContent = i;
+            pageBtn.addEventListener('click', () => goToPage(i));
+            pageNumbersContainer.appendChild(pageBtn);
+        }
+        
+        // Update pagination info
+        updatePaginationInfo();
+        
+        // Show/hide prev/next buttons
+        prevPageBtn.disabled = currentPage === 1;
+        nextPageBtn.disabled = currentPage === totalPages;
+    }
+    
+    // Update pagination information
+    function updatePaginationInfo() {
+        const startIndex = (currentPage - 1) * ticketsPerPage + 1;
+        const endIndex = Math.min(currentPage * ticketsPerPage, totalTickets);
+        
+        startIndexSpan.textContent = startIndex;
+        endIndexSpan.textContent = endIndex;
+        totalTicketsSpan.textContent = totalTickets;
+    }
+    
+    // Go to specific page
+    function goToPage(page) {
+        if (page < 1 || page > totalPages) return;
+        
+        currentPage = page;
+        initializePagination();
+        displayTicketsForCurrentPage();
+    }
+    
+    // Display tickets for current page
+    function displayTicketsForCurrentPage() {
+        const startIndex = (currentPage - 1) * ticketsPerPage;
+        const endIndex = startIndex + ticketsPerPage;
+        
+        ticketRows.forEach((row, index) => {
+            if (index >= startIndex && index < endIndex) {
+                row.style.display = 'grid';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+    
+    // Event listeners for pagination buttons
+    prevPageBtn.addEventListener('click', () => goToPage(currentPage - 1));
+    nextPageBtn.addEventListener('click', () => goToPage(currentPage + 1));
+    
+    // Initialize everything
+    initializePagination();
+    displayTicketsForCurrentPage();
+    
+    // Filter dropdown toggle
+    const statusFilterBtn = document.getElementById('status-filter-btn');
+    const dateFilterBtn = document.getElementById('date-filter-btn');
+    const statusDropdown = document.getElementById('status-dropdown');
+    const dateDropdown = document.getElementById('date-dropdown');
+    
+    statusFilterBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        dateDropdown.style.display = 'none';
+        statusDropdown.style.display = statusDropdown.style.display === 'block' ? 'none' : 'block';
+    });
+    
+    dateFilterBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        statusDropdown.style.display = 'none';
+        dateDropdown.style.display = dateDropdown.style.display === 'block' ? 'none' : 'block';
+    });
+    
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function() {
+        statusDropdown.style.display = 'none';
+        dateDropdown.style.display = 'none';
+    });
+    
+    // Prevent dropdown close when clicking inside
+    statusDropdown.addEventListener('click', function(e) {
+        e.stopPropagation();
+    });
+    
+    dateDropdown.addEventListener('click', function(e) {
+        e.stopPropagation();
+    });
+    
+    // Real-time search functionality
+    const ticketSearch = document.getElementById('ticket-search');
+    
+    ticketSearch.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        
+        ticketRows.forEach(row => {
+            const ticketId = row.querySelector('.ticket-id').textContent.toLowerCase();
+            if (ticketId.includes(searchTerm)) {
+                row.style.display = 'grid';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        
+        // Reset pagination when searching
+        currentPage = 1;
+        initializePagination();
+    });
+    
+    // Status filter functionality
+    const statusSelect = document.getElementById('status-select');
+    
+    statusSelect.addEventListener('change', function() {
+        const selectedStatus = this.value;
+        
+        ticketRows.forEach(row => {
+            const rowStatus = row.getAttribute('data-status');
+            
+            if (selectedStatus === 'all' || rowStatus === selectedStatus) {
+                row.style.display = 'grid';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        
+        // Reset pagination when filtering
+        currentPage = 1;
+        initializePagination();
+    });
+    
+    // Date filter functionality
+    const applyDateBtn = document.querySelector('.apply-date-btn');
+    
+    applyDateBtn.addEventListener('click', function() {
+        const fromDate = document.getElementById('from-date').value;
+        const toDate = document.getElementById('to-date').value;
+        
+        if (!fromDate || !toDate) {
+            alert('Please select both from and to dates');
+            return;
+        }
+        
+        const fromDateObj = new Date(fromDate);
+        const toDateObj = new Date(toDate);
+        
+        ticketRows.forEach(row => {
+            const ticketDate = new Date(row.getAttribute('data-date'));
+            
+            if (ticketDate >= fromDateObj && ticketDate <= toDateObj) {
+                row.style.display = 'grid';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        
+        dateDropdown.style.display = 'none';
+        
+        // Reset pagination when filtering
+        currentPage = 1;
+        initializePagination();
+    });
+    
+    // Initialize date pickers with default values
+    const today = new Date();
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(today.getMonth() - 1);
+    
+    document.getElementById('from-date').valueAsDate = oneMonthAgo;
+    document.getElementById('to-date').valueAsDate = today;
+    
+    // Make table horizontally scrollable on mobile
+    const ticketsGrid = document.querySelector('.admin-tickets-grid');
+    let isDragging = false;
+    let startX, scrollLeft;
+    
+    ticketsGrid.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        startX = e.pageX - ticketsGrid.offsetLeft;
+        scrollLeft = ticketsGrid.scrollLeft;
+        ticketsGrid.style.cursor = 'grabbing';
+    });
+    
+    ticketsGrid.addEventListener('mouseleave', () => {
+        isDragging = false;
+        ticketsGrid.style.cursor = 'grab';
+    });
+    
+    ticketsGrid.addEventListener('mouseup', () => {
+        isDragging = false;
+        ticketsGrid.style.cursor = 'grab';
+    });
+    
+    ticketsGrid.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+        const x = e.pageX - ticketsGrid.offsetLeft;
+        const walk = (x - startX) * 2; // Scroll speed
+        ticketsGrid.scrollLeft = scrollLeft - walk;
+    });
+    
+    // Touch events for mobile
+    ticketsGrid.addEventListener('touchstart', (e) => {
+        isDragging = true;
+        startX = e.touches[0].pageX - ticketsGrid.offsetLeft;
+        scrollLeft = ticketsGrid.scrollLeft;
+    });
+    
+    ticketsGrid.addEventListener('touchend', () => {
+        isDragging = false;
+    });
+    
+    ticketsGrid.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+        const x = e.touches[0].pageX - ticketsGrid.offsetLeft;
+        const walk = (x - startX) * 2;
+        ticketsGrid.scrollLeft = scrollLeft - walk;
+    });
+});
+</script>
+{% endblock %}
