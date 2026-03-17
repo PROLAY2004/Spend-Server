@@ -36,6 +36,8 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
 CSRF_TRUSTED_ORIGINS = [
     "https://spendserver-bwfhbecac4hhenag.centralindia-01.azurewebsites.net", 
     "http://spendserver.dev/"
