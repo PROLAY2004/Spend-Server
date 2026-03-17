@@ -36,6 +36,10 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://spendserver-bwfhbecac4hhenag.centralindia-01.azurewebsites.net", 
+    "http://spendserver.dev/"
+]
 
 # Application definition
 SITE_ID = 1
