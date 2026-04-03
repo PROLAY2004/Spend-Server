@@ -26,7 +26,7 @@ def home(request):
             Email = request.POST.get("Email")
             Message = request.POST.get("Msg")
 
-            if "searchregister" in Message:
+            if "searchregister" in Message.lower():
                 messages.error(request, "searchregister.net is blocked.")
                 return redirect("/Home/")
                             
@@ -59,7 +59,7 @@ def home(request):
             Email = request.POST.get("Email")
             Message = request.POST.get("Msg")
 
-            if "searchregister" in Message:
+            if "searchregister" in Message.lower():
                 messages.error(request, "searchregister.net is blocked.")
                 return redirect("/Home/")
             
