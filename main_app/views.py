@@ -27,7 +27,8 @@ def home(request):
             Message = request.POST.get("Msg")
 
             if "[https://searchregister.net]" in Message:
-                return redirect("/Home/?error='searchregister.net is blocked.'")
+                messages.error(request, "searchregister.net is blocked.")
+                return redirect("/Home/")
                             
             value = {
                 "user_name" : name,
@@ -59,7 +60,8 @@ def home(request):
             Message = request.POST.get("Msg")
 
             if "[https://searchregister.net]" in Message:
-                return redirect("/Home/?error='searchregister.net is blocked.'")
+                messages.error(request, "searchregister.net is blocked.")
+                return redirect("/Home/")
             
             value = {
                 "user_name" : name,
