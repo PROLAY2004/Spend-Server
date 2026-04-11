@@ -236,8 +236,8 @@
         // Remove row functionality (temporary)
         document.addEventListener('click', function (e) {
             // Handle remove action (click on X icon)
-            if (e.target.classList.contains('fa-times') || e.target.closest('.remove-btn:not(.undo-btn)')) {
-                const btn = e.target.classList.contains('fa-times') ? e.target.parentElement : e.target;
+            if (e.target.closest('.remove-btn') && !e.target.closest('.remove-btn').classList.contains('undo-btn')) {
+                const btn = e.target.closest('.remove-btn');
                 const row = btn.closest('tr');
 
                 // Mark row as removed
