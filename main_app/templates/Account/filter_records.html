@@ -252,7 +252,7 @@
             }
 
             // Handle undo action (click on undo icon or button)
-            if (e.target.classList.contains('fa-undo') || e.target.closest('.undo-btn')) {
+            else if (e.target.classList.contains('fa-undo') || e.target.closest('.undo-btn')) {
                 const btn = e.target.classList.contains('fa-undo') ? e.target.parentElement : e.target;
                 const row = btn.closest('tr');
 
